@@ -1,6 +1,8 @@
-﻿namespace MsbtLib.Controls
+﻿using System.Text.RegularExpressions;
+
+namespace MsbtLib.Controls
 {
-    enum Color
+    enum FontColor
     {
         Red,
         LightGreen1,
@@ -13,41 +15,45 @@
     }
     internal class SetColor : Control
     {
-        public Color Color { get; set; }
-        public SetColor(ushort col)
+        public const ushort tag_group = 0x0000;
+        public const ushort tag_type = 0x0003;
+        private ushort param_size;
+        private FontColor Color;
+        public SetColor(List<ushort> parameters)
         {
-            Color = (Color)col;
+            param_size = parameters[0];
+            Color = (FontColor)parameters[1];
         }
         public SetColor(string str)
         {
             if (str == "</color>")
             {
-                Color = Color.Reset;
+                Color = FontColor.Reset;
             }
             else
             {
-                string parsed = str.Replace("<color=", "").Replace(">", "");
-                Color = parsed switch
+                Match m = new Regex(@"<color=(.+)>").Match(str);
+                if (!m.Success)
                 {
-                    "Red" or "red" => Color.Red,
-                    "LightGreen1" or "lightgreen1" => Color.LightGreen1,
-                    "Blue" or "blue" => Color.Blue,
-                    "Grey" or "grey" => Color.Grey,
-                    "LightGreen4" or "lightgreen4" => Color.LightGreen4,
-                    "Orange" or "orange" => Color.Orange,
-                    "LightGrey" or "lightgrey" => Color.LightGrey,
-                    _ => throw new Exception("Invalid color for SetColor"),
-                };
+                    throw new Exception("Proper usage: <color=?> where ? is a valid color name. Valid examples: <color=Red> or <color=LightGreen4>");
+                }
+                Color = (FontColor)Enum.Parse(typeof(FontColor), m.Groups[1].ToString());
             }
+            param_size = 2;
         }
-        public override byte[] ToControlSequence()
+        public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] color = BitConverter.GetBytes((ushort)Color);
-            return new byte[] { 0x00, 0x00, 0x03, 0x00, 0x02, 0x00, color[0], color[1] };
+            byte[] bytes = new byte[param_size + 8];
+            bytes.Merge(converter.GetBytes(control_tag), 0);
+            bytes.Merge(converter.GetBytes(tag_group), 2);
+            bytes.Merge(converter.GetBytes(tag_type), 4);
+            bytes.Merge(converter.GetBytes(param_size), 6);
+            bytes.Merge(converter.GetBytes((ushort)Color), 8);
+            return bytes;
         }
         public override string ToControlString()
         {
-            if (Color == Color.Reset)
+            if (Color == FontColor.Reset)
             {
                 return "</color>";
             }

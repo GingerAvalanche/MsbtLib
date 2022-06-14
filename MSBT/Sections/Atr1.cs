@@ -1,70 +1,65 @@
 ﻿using JetBrains.Annotations;
-using System.Text;
 
 namespace MsbtLib.Sections
 {
     internal class Atr1 : ICalculatesSize, IUpdates
     {
+        private readonly List<string> _strings;
         [NotNull]
         public Header header;
         public SectionHeader section;
-        public uint string_count;
         public uint _unknown_1;
-        public List<List<byte>> raw_strings;
+        public List<string> Strings { get => _strings; }
 
-        public Atr1(Header header, SectionHeader section, uint string_count, uint _unknown_1, IEnumerable<string> strings)
+        public Atr1(Header header, SectionHeader section, uint string_count, uint _unknown_1, List<string> strings)
         {
             this.header = header;
             this.section = section;
-            this.string_count = string_count;
             this._unknown_1 = _unknown_1;
-            SetStrings(strings);
+            _strings = strings;
         }
 
-        public List<string> Strings()
+        public uint AddString(string str)
         {
-            return header.encoding switch
-            {
-                UTFEncoding.UTF16 => raw_strings
-                    .Select(s => s.Chunk(2).Select(s => s.ToArray()))
-                    .SelectMany(s => s.Select(s => Encoding.Unicode.GetString(s)))
-                    .ToList(),
-                _ => raw_strings
-                    .Select(r => Encoding.UTF8.GetString(r.ToArray()))
-                    .ToList(),
-            };
+            uint index = (uint)_strings.Count;
+            _strings.Add(str);
+            return index;
         }
 
         public void SetStrings(IEnumerable<string> strings)
         {
-            switch (header.encoding)
+            _strings.Clear();
+            foreach (string str in strings)
             {
-                case UTFEncoding.UTF16:
-                    raw_strings = strings
-                        .Select(s => Encoding.Unicode.GetBytes(s).ToList())
-                        .ToList();
-                    break;
-                case UTFEncoding.UTF8:
-                    raw_strings = strings
-                        .Select(r => Encoding.UTF8.GetBytes(r).ToList())
-                        .ToList();
-                    break;
+                _strings.Add(str);
             }
         }
 
         public void Update()
         {
-            string_count = (uint)Strings().Count;
-            section.size = (uint)(sizeof(uint) // Marshal.SizeOf(string_count)
-                + sizeof(uint) // Marshal.SizeOf(_unknown_1)
-                + sizeof(uint) * string_count // offsets
-                + raw_strings.Select(c => c.Count).Sum());
+            uint size = sizeof(uint) * 2; // Marshal.SizeOf(_unknown_1) + Marshal.SizeOf(_unknown_1)
+            if (_strings.Any(s => !string.IsNullOrEmpty(s)))
+            {
+                size += (uint)(sizeof(uint) * _strings.Count // offsets
+                    + _strings.Select(s => Util.StringToRaw(s, header.encoding, header.converter).Count).Sum());
+                _unknown_1 = 4;
+            }
+            else
+            {
+                _unknown_1 = 0;
+            }
+            section.size = size;
         }
 
-        public ulong CalcSize() => section.CalcSize()
-                + (ulong)(sizeof(uint) // Marshal.SizeOf(string_count)
-                + sizeof(uint) // Marshal.SizeOf(_unknown_1)
-                + sizeof(uint) * string_count // offsets
-                + raw_strings.Select(c => c.Count).Sum());
+        public ulong CalcSize()
+        {
+            ulong size = section.CalcSize() + sizeof(uint) * 2; // Marshal.SizeOf(_unknown_1) + Marshal.SizeOf(_unknown_1)
+            if (_strings.Any(s => !string.IsNullOrEmpty(s)))
+            {
+                size += (ulong)(sizeof(uint) * _strings.Count // offsets
+                    + _strings.Select(s => Util.StringToRaw(s, header.encoding, header.converter).Count).Sum());
+            }
+            return size;
+        }
     }
 }

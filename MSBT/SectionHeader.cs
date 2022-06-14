@@ -1,6 +1,6 @@
 ﻿namespace MsbtLib
 {
-    class SectionHeader : ICalculatesSize
+    internal class SectionHeader : ICalculatesSize
     {
         public byte[] magic = new byte[4];
         public uint size;

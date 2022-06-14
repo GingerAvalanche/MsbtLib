@@ -1,10 +1,12 @@
-﻿namespace MsbtLib
+﻿using System.Text;
+
+namespace MsbtLib
 {
     class Util
     {
         public static ushort ReverseBytes(ushort val)
         {
-            return (ushort)((val & (ushort)0x00FFu) << 8 | (val & (ushort)0xFFu) >> 8);
+            return (ushort)((val & (ushort)0x00FFu) << 8 | (val & (ushort)0xFF00u) >> 8);
         }
 
         public static uint ReverseBytes(uint val)
@@ -30,21 +32,57 @@
         {
             return s + char.MinValue;
         }
-
-        public static string ToStringUnicode(List<byte> a)
+        public static List<byte> StringToRaw(string input, UTFEncoding encoding, EndiannessConverter converter)
+        {
+            char control = '<';
+            Queue<char> queue = new(AppendNull(input));
+            List<byte> bytes = new();
+            List<char> sequence = new();
+            while (queue.Count > 0)
+            {
+                char c = queue.Dequeue();
+                if (c == control)
+                {
+                    char lastChar = c;
+                    sequence.Clear();
+                    sequence.Add(lastChar);
+                    while (lastChar != '>')
+                    {
+                        lastChar = queue.Dequeue();
+                        sequence.Add(lastChar);
+                    }
+                    bytes.AddRange(Control.GetControl(string.Join("", sequence)).ToControlSequence(converter));
+                }
+                else
+                {
+                    switch (encoding)
+                    {
+                        case UTFEncoding.UTF16:
+                            bytes.AddRange(converter.GetBytes(c));
+                            break;
+                        case UTFEncoding.UTF8:
+                            bytes.Add(Convert.ToByte(c));
+                            break;
+                    }
+                }
+            }
+            return bytes;
+        }
+        public static string RawToString(List<byte> input, UTFEncoding encoding, EndiannessConverter converter)
         {
             char control = '\u000E';
-            Queue<byte> queue = new(a);
-            byte[] charBytes = new byte[2];
+            Queue<byte> queue = new(input);
             List<char> chars = new();
             while (queue.Count > 0)
             {
-                charBytes[0] = queue.Dequeue();
-                charBytes[1] = queue.Dequeue();
-                char c = BitConverter.ToChar(charBytes);
+                char c = encoding switch
+                {
+                    UTFEncoding.UTF16 => Convert.ToChar(converter.Convert(queue.DequeueUInt16())),
+                    _ => Convert.ToChar(queue.Dequeue()),
+                };
                 if (c == control)
                 {
-                    chars.AddRange(Control.ParseControlBytes(ref queue).ToControlString());
+                    chars.AddRange(Control.GetControl(ref queue, converter).ToControlString());
                 }
                 else
                 {

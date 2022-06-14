@@ -30,24 +30,6 @@ namespace MsbtLib
             return enumerable.ChunkCore(batchSize);
         }
 
-        public static IEnumerable<byte> ToEndianness(this IEnumerable<byte> bytes, Endianness endianness)
-        {
-            return endianness switch
-            {
-                Endianness.Big => bytes.Reverse(),
-                _ => bytes,
-            };
-        }
-
-        public static string ToStringEncoding(this IEnumerable<byte> chars, UTFEncoding encoding)
-        {
-            return encoding switch
-            {
-                UTFEncoding.UTF16 => Encoding.Unicode.GetString(chars.ToArray()),
-                _ => Encoding.UTF8.GetString(chars.ToArray()),
-            };
-        }
-
         public static T[] Fill<T>(this T[] array, T val)
         {
             for (int i = 0; i < array.Length; i++)
@@ -55,6 +37,36 @@ namespace MsbtLib
                 array[i] = val;
             }
             return array;
+        }
+        public static ushort DequeueUInt16(this Queue<byte> queue)
+        {
+            byte[] bytes = new byte[] { queue.Dequeue(), queue.Dequeue() };
+            return BitConverter.ToUInt16(bytes);
+        }
+        public static void Merge<T>(this T[] arr, IEnumerable<T> other, int start_index)
+        {
+            if (arr.Length < (start_index + other.Count()))
+            {
+                Array.Resize(ref arr, start_index + other.Count());
+            }
+            int i = 0;
+            foreach (T obj in other)
+            {
+                arr[start_index + i] = obj;
+                i++;
+            }
+        }
+        public static List<T> GetRange<T>(this List<T> list, Range range)
+        {
+            var (start, length) = range.GetOffsetAndLength(list.Count);
+            return list.GetRange(start, length);
+        }
+        public static void Add<T>(this List<T> list, T add, int num)
+        {
+            for (int i = 0; i < num; i++)
+            {
+                list.Add(add);
+            }
         }
     }
 }

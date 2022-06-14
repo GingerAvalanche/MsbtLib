@@ -3,7 +3,7 @@
     public class Header : ICalculatesSize
     {
         public byte[] magic = new byte[8];
-        public Endianness endianness;
+        public EndiannessConverter converter;
         public ushort _unknown_1;
         public UTFEncoding encoding;
         public byte version;
@@ -12,10 +12,10 @@
         public uint file_size;
         public byte[] padding = new byte[10];
 
-        public Header(byte[] magic, Endianness endianness, ushort _unknown_1, UTFEncoding encoding, byte version, ushort section_count, ushort _unknown_2, uint file_size, byte[] padding)
+        public Header(byte[] magic, EndiannessConverter converter, ushort _unknown_1, UTFEncoding encoding, byte version, ushort section_count, ushort _unknown_2, uint file_size, byte[] padding)
         {
             this.magic = magic;
-            this.endianness = endianness;
+            this.converter = converter;
             this._unknown_1 = _unknown_1;
             this.encoding = encoding;
             this.version = version;

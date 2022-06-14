@@ -26,6 +26,18 @@ namespace MsbtLib
         UTF16
     }
 
+    public struct MsbtEntry
+    {
+        public string Attribute;
+        public string Value;
+
+        public MsbtEntry(string attribute, string value)
+        {
+            Attribute = attribute;
+            Value = value;
+        }
+    }
+
     public class MSBT : ICalculatesSize, IUpdates
     {
         public static readonly string HEADER_MAGIC = "MsgStdBn";
@@ -33,22 +45,22 @@ namespace MsbtLib
         public const ulong PADDING_LENGTH = 16;
         public Header header;
         public List<SectionTag> section_order;
-        [CanBeNull]
-        internal Ato1 ato1;
-        [CanBeNull]
-        internal Atr1 atr1;
-        [CanBeNull]
-        internal Lbl1 lbl1;
-        [CanBeNull]
-        internal Nli1 nli1;
-        [CanBeNull]
-        internal Tsy1 tsy1;
-        [CanBeNull]
-        internal Txt2 txt2;
+        internal Ato1? ato1;
+        internal Atr1? atr1;
+        internal Lbl1? lbl1;
+        internal Nli1? nli1;
+        internal Tsy1? tsy1;
+        internal Txt2? txt2;
 
+        public MSBT(Endianness endianness, UTFEncoding encoding)
+        {
+            header = new(Encoding.ASCII.GetBytes(HEADER_MAGIC), new(endianness), 0, encoding, 3, 0, 0, 0x20, new byte[10]);
+            section_order = new List<SectionTag>();
+        }
         public MSBT(Stream stream)
         {
             MsbtReader reader = new(new BinaryReader(stream));
+            header = reader.Header;
             section_order = new();
             while (true) {
                 if (reader.HasReachedEOF()) {
@@ -82,12 +94,15 @@ namespace MsbtLib
                 }
                 reader.SkipPadding();
             }
+            stream.Dispose();
         }
 
-        public Stream Write()
+        public void Write(string file_name)
         {
-            MsbtWriter writer = new(this, new BinaryWriter(new MemoryStream()));
+            Update();
+            MsbtWriter writer = new(this, new BinaryWriter(new FileStream(file_name, FileMode.Create, FileAccess.Write)));
             writer.WriteHeader();
+#pragma warning disable CS8604 // Possible null reference argument.
             foreach (SectionTag tag in section_order) {
                 switch (tag) {
                     case SectionTag.Ato1:
@@ -110,35 +125,114 @@ namespace MsbtLib
                         break;
                 }
             }
-            return writer.writer.writer.BaseStream;
+#pragma warning restore CS8604 // Possible null reference argument.
+            writer.Finish();
         }
 
-        public Dictionary<string, string> GetTexts()
+        public void CreateAto1()
         {
-            Dictionary<string, string> texts = new();
-            List<string> strings = txt2.Strings();
-            foreach (Label label in lbl1.labels) {
-                texts.Add(label.name, strings[(int)label.index]);
+            if (ato1 != null)
+            {
+                return;
+            }
+            ato1 = new(new(Encoding.ASCII.GetBytes("ATO1"), 0), Array.Empty<byte>());
+            section_order.Add(SectionTag.Ato1);
+            header.section_count += 1;
+        }
+        public void CreateAtr1()
+        {
+            if (atr1 != null)
+            {
+                return;
+            }
+            atr1 = new(header, new(Encoding.ASCII.GetBytes("ATR1"), 8), 0, 0, new());
+            section_order.Add(SectionTag.Atr1);
+            header.section_count += 1;
+            if (lbl1 != null)
+            {
+                atr1.SetStrings(lbl1.Labels.Select(l => ""));
+            }
+        }
+        public void CreateLbl1()
+        {
+            if (lbl1 != null)
+            {
+                return;
+            }
+            lbl1 = new(this, new(Encoding.ASCII.GetBytes("LBL1"), 12));
+            section_order.Add(SectionTag.Lbl1);
+            header.section_count += 1;
+        }
+        public void CreateTxt2()
+        {
+            if (txt2 != null)
+            {
+                return;
+            }
+            txt2 = new(header, new(Encoding.ASCII.GetBytes("TXT2"), 8), new());
+            section_order.Add(SectionTag.Txt2);
+            header.section_count += 1;
+            if (lbl1 != null)
+            {
+                txt2.SetStrings(lbl1.Labels.Select(l => ""));
+            }
+        }
+
+        public Dictionary<string, MsbtEntry> GetTexts()
+        {
+            if (lbl1 == null || atr1 == null || txt2 == null)
+            {
+                throw new Exception("This MSBT does not contain texts.");
+            }
+            Dictionary<string, MsbtEntry> texts = new();
+            foreach (Label label in lbl1.Labels) {
+                texts.Add(label.Name, new(atr1.Strings[(int)label.Index], txt2.Strings[(int)label.Index]));
             }
             return texts;
         }
 
-        public void SetTexts(Dictionary<string, string> texts)
+        public void SetTexts(Dictionary<string, MsbtEntry> texts)
         {
-            List<string> strings = new();
-            List<Label> labels = new();
-            foreach (KeyValuePair<string, string> kvp in texts) {
-                labels.Add(new Label(lbl1, kvp.Value, (uint)strings.Count, Label.GenerateChecksum(kvp.Value, lbl1.group_count)));
-                strings.Add(kvp.Key);
+            if (lbl1 == null || txt2 == null)
+            {
+                throw new Exception(@"This MSBT does not support texts. Use CreateLbl1() and/or 
+                    CreateTxt2() to make it support texts.");
             }
-            lbl1.labels = labels;
+            if (texts.Values.Any(e => !string.IsNullOrEmpty(e.Attribute)) && atr1 == null)
+            {
+                throw new Exception(@"This MSBT has no attribute section but was given an attribute. 
+                    Use CreateAtr1() to give it an attribute section if you want it to have one.");
+            }
+            List<string> new_keys = texts.Keys.Except(lbl1.Labels.Select(l => l.Name)).ToList();
+            foreach (string old_key in texts.Keys.Except(new_keys))
+            {
+                Label label = lbl1.Labels.First(l => l.Name == old_key);
+                if (atr1 != null)
+                {
+                    label.Attribute = texts[old_key].Attribute;
+                }
+                label.Value = texts[old_key].Value;
+            }
+            foreach (string new_key in new_keys)
+            {
+                uint index = 0;
+                if (atr1 != null)
+                {
+                    atr1.AddString(texts[new_key].Attribute);
+                }
+                index = txt2.AddString(texts[new_key].Value);
+                lbl1.Labels.Add(new(lbl1, new_key, index));
+            }
             lbl1.Update();
-            txt2.SetStrings(strings);
+            if (atr1 != null)
+            {
+                atr1.Update();
+            }
             txt2.Update();
         }
 
         public void SetEncoding(UTFEncoding encoding) => header.encoding = encoding;
-        public void SetEndianness(Endianness endianness) => header.endianness = endianness;
+        public void SetEndianness(Endianness endianness) => header.converter.SetEndianness(endianness);
         public ulong PlusPadding(ulong size)
         {
             ulong rem = size % 16ul;
@@ -157,12 +251,12 @@ namespace MsbtLib
         public ulong CalcSize()
         {
             return header.CalcSize()
-                + PlusPadding(lbl1.CalcSize())
-                + PlusPadding(nli1.CalcSize())
-                + PlusPadding(ato1.CalcSize())
-                + PlusPadding(atr1.CalcSize())
-                + PlusPadding(tsy1.CalcSize())
-                + PlusPadding(txt2.CalcSize());
+                + (lbl1 != null ? PlusPadding(lbl1.CalcSize()) : 0)
+                + (nli1 != null ? PlusPadding(nli1.CalcSize()) : 0)
+                + (ato1 != null ? PlusPadding(ato1.CalcSize()) : 0)
+                + (atr1 != null ? PlusPadding(atr1.CalcSize()) : 0)
+                + (tsy1 != null ? PlusPadding(tsy1.CalcSize()) : 0)
+                + (txt2 != null ? PlusPadding(txt2.CalcSize()) : 0);
         }
     }
 }
