@@ -26,7 +26,7 @@ namespace MsbtLib
         UTF16
     }
 
-    public struct MsbtEntry
+    public class MsbtEntry
     {
         public string Attribute;
         public string Value;
