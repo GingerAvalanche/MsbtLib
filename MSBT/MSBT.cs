@@ -217,13 +217,14 @@ namespace MsbtLib
 
         public Dictionary<string, MsbtEntry> GetTexts()
         {
-            if (lbl1 == null || atr1 == null || txt2 == null)
+            if (lbl1 == null || txt2 == null)
             {
                 throw new Exception("This MSBT does not contain texts.");
             }
             Dictionary<string, MsbtEntry> texts = new();
             foreach (Label label in lbl1.Labels) {
-                texts.Add(label.Name, new(atr1.Strings[(int)label.Index], txt2.Strings[(int)label.Index]));
+                string atr = atr1?.Strings[(int)label.Index] ?? string.Empty;
+                texts.Add(label.Name, new(atr, txt2.Strings[(int)label.Index]));
             }
             return texts;
         }
