@@ -148,7 +148,8 @@ namespace MsbtLib
 
         public void Finish()
         {
-            writer.Flush();
+            writer.writer.Flush();
+            writer.writer.Dispose();
         }
     }
 
@@ -198,7 +199,5 @@ namespace MsbtLib
             written += 8ul;
             return 8ul;
         }
-
-        public void Flush() => writer.Flush();
     }
 }

@@ -129,6 +129,42 @@ namespace MsbtLib
             writer.Finish();
         }
 
+        public byte[] Write()
+        {
+            Update();
+            MsbtWriter writer = new(this, new BinaryWriter(new MemoryStream((int)header.file_size)));
+            writer.WriteHeader();
+#pragma warning disable CS8604 // Possible null reference argument.
+            foreach (SectionTag tag in section_order)
+            {
+                switch (tag)
+                {
+                    case SectionTag.Ato1:
+                        writer.WriteAto1(ato1);
+                        break;
+                    case SectionTag.Atr1:
+                        writer.WriteAtr1(atr1);
+                        break;
+                    case SectionTag.Lbl1:
+                        writer.WriteLbl1(lbl1);
+                        break;
+                    case SectionTag.Nli1:
+                        writer.WriteNli1(nli1);
+                        break;
+                    case SectionTag.Tsy1:
+                        writer.WriteTsy1(tsy1);
+                        break;
+                    case SectionTag.Txt2:
+                        writer.WriteTxt2(txt2);
+                        break;
+                }
+            }
+#pragma warning restore CS8604 // Possible null reference argument.
+            byte[] bytes = ((MemoryStream)writer.writer.writer.BaseStream).ToArray();
+            writer.Finish();
+            return bytes;
+        }
+
         public void CreateAto1()
         {
             if (ato1 != null)
