@@ -59,7 +59,8 @@ namespace MsbtLib
         }
         public MSBT(Stream stream)
         {
-            MsbtReader reader = new(new BinaryReader(stream));
+            using BinaryReader b_reader = new(stream);
+            MsbtReader reader = new(b_reader);
             header = reader.Header;
             section_order = new();
             while (true) {
@@ -94,13 +95,14 @@ namespace MsbtLib
                 }
                 reader.SkipPadding();
             }
-            stream.Dispose();
         }
 
         public void Write(string file_name)
         {
             Update();
-            MsbtWriter writer = new(this, new BinaryWriter(new FileStream(file_name, FileMode.Create, FileAccess.Write)));
+            using FileStream f_stream = new(file_name, FileMode.Create, FileAccess.Write);
+            using BinaryWriter b_writer = new(f_stream);
+            MsbtWriter writer = new(this, b_writer);
             writer.WriteHeader();
 #pragma warning disable CS8604 // Possible null reference argument.
             foreach (SectionTag tag in section_order) {
@@ -126,13 +128,14 @@ namespace MsbtLib
                 }
             }
 #pragma warning restore CS8604 // Possible null reference argument.
-            writer.Finish();
         }
 
         public byte[] Write()
         {
             Update();
-            MsbtWriter writer = new(this, new BinaryWriter(new MemoryStream((int)header.file_size)));
+            using MemoryStream m_stream = new((int)header.file_size);
+            using BinaryWriter b_writer = new(m_stream);
+            MsbtWriter writer = new(this, b_writer);
             writer.WriteHeader();
 #pragma warning disable CS8604 // Possible null reference argument.
             foreach (SectionTag tag in section_order)
@@ -160,9 +163,7 @@ namespace MsbtLib
                 }
             }
 #pragma warning restore CS8604 // Possible null reference argument.
-            byte[] bytes = ((MemoryStream)writer.writer.writer.BaseStream).ToArray();
-            writer.Finish();
-            return bytes;
+            return ((MemoryStream)writer.writer.writer.BaseStream).ToArray();
         }
 
         public void CreateAto1()

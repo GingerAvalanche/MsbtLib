@@ -145,12 +145,6 @@ namespace MsbtLib
             }
             writer.Write(new byte[MSBT.PADDING_LENGTH - rem].Fill(MSBT.PADDING_CHAR));
         }
-
-        public void Finish()
-        {
-            writer.writer.Flush();
-            writer.writer.Dispose();
-        }
     }
 
     internal class WriteCounter
