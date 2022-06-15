@@ -17,6 +17,13 @@ namespace MsbtLib.Sections
             this.section = section;
             this._unknown_1 = _unknown_1;
             _strings = strings;
+            if (strings.Count == 0)
+            {
+                for (int i = 0; i < string_count; i++)
+                {
+                    strings.Add(string.Empty);
+                }
+            }
         }
 
         public uint AddString(string str)

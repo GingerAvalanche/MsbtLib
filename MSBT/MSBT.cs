@@ -185,10 +185,6 @@ namespace MsbtLib
             atr1 = new(header, new(Encoding.ASCII.GetBytes("ATR1"), 8), 0, 0, new());
             section_order.Add(SectionTag.Atr1);
             header.section_count += 1;
-            if (lbl1 != null)
-            {
-                atr1.SetStrings(lbl1.Labels.Select(l => ""));
-            }
         }
         public void CreateLbl1()
         {
