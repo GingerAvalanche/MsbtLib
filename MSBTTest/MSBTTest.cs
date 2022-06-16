@@ -154,5 +154,22 @@ namespace MSBTTests
                 Assert.IsNotNull(texts);
             }
         }
+        [TestMethod]
+        public void CheckAllMSBTsForKey5502()
+        {
+            Matcher matcher = new();
+            matcher.AddInclude("**/*.msbt");
+            IEnumerable<string> files = matcher.GetResultsInFullPath(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\");
+            foreach (string file in files)
+            {
+                MSBT msbt = new(File.ReadAllBytes(file));
+                Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
+                if (texts.ContainsKey("5502"))
+                {
+                    Trace.WriteLine(Path.GetFileName(file));
+                    Trace.WriteLine(texts["5502"].Value);
+                }
+            }
+        }
     }
 }

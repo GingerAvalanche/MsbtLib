@@ -73,10 +73,10 @@ Console.WriteLine(texts["Armor_063_Head_Desc"].Value);
 Valid tags are:
 * animation - `<animation=[name] />`
 * auto advance - `<auto_advance=[num_frames] />`
-* one choice - `<choice1=[uint16] />`†
-* two choice - `<choice2 1=[uint16] 2=[uint16] cancel=[index] />`†
-* three choice - `<choice3 1=[uint16] 2=[uint16] 3=[uint16] cancel=[index] >`†
-* four choice - `<choice4 1=[uint16] 2=[uint16] 3=[uint16] 4=[uint16] cancel=[index] >`†
+* one choice - `<choice1=[key] />`†
+* two choice - `<choice2 0=[key] 1=[key] cancel=[index] />`†
+* three choice - `<choice3 0=[key] 1=[key] 2=[key] cancel=[index] >`†
+* four choice - `<choice4 0=[key] 1=[key] 2=[key] 3=[key] cancel=[index] >`†
 * font - `<font=[face] />` - Only `Normal` and `Hylian`
 * icon - `<icon=[character] />` - Some characters require numbers, e.g. `A(10)`
 * pause for a number of frames - `<pauseframes=[num_frames] />`
@@ -87,11 +87,15 @@ Valid tags are:
 * sound - `<sound field_1=[uint8] field_2=[uint8] />`‡
 * another sound type - `<sound2=[uint8] />`‡
 * text size - `<textsize percent=[num] />` - Be sure to `<textsize percent=100 />` to reset
-* variable - `<variable kind=[uint16] name=[name] />`† - `name` must correspond to a variable
+* variable - `<variable kind=[uint16] name=[name] />`♠ - `name` must correspond to a variable
     name in the executable
 
-† - It is currently unknown how the game uses these `uint16`s  
-‡ - It is currently unknown how the game uses these `uint8`s
+† - These `key`s are keys for other localized strings. Normally those keys are read from 
+the same MSBT, but in the case of shops, they are read from the shop NPC's MSBT. The keys 
+are read as `%04d`-formatted strings, e.g. 4 is read as "0004". The `index`es are for which 
+choice represents a cancellation.  
+‡ - It is currently unknown how the game uses these `uint8`s  
+♠ - It is currently unknown how the game uses these `uint16`s
 
 ### Writing
 
