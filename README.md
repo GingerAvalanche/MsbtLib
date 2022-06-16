@@ -19,7 +19,9 @@ using FileStream f_stream = File.OpenRead("C:/extracted_msbts/Msg_USen.product/A
 MSBT msbt = new(f_stream);
 ```
 
-#### From a byte array from a [SarcFile](https://github.com/ArchLeaders/NCF-Library/blob/master/SarcLibrary/SarcFile.cs)
+#### From a byte array
+
+Example: from a [SarcFile](https://github.com/ArchLeaders/NCF-Library/blob/master/SarcLibrary/SarcFile.cs)
 
 ```
 using Nintendo.Sarc;
@@ -56,7 +58,7 @@ these tags in-line, for example:
 
 ```
 // with texts from ActorType/ArmorHead.msbt
-Console.WriteLine(texts["Armor_063_Head_Desc"]);
+Console.WriteLine(texts["Armor_063_Head_Desc"].Value);
 
 /*
 * Output:
