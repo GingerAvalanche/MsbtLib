@@ -88,7 +88,7 @@ Valid tags are:
 * variable - `<variable kind=[uint16] name=[name] />`† - `name` must correspond to a variable
     name in the executable
 
-† - It is currently unknown how the game uses these `uint16`s
+† - It is currently unknown how the game uses these `uint16`s  
 ‡ - It is currently unknown how the game uses these `uint8`s
 
 ### Writing
