@@ -1,3 +1,4 @@
+using Microsoft.Extensions.FileSystemGlobbing;
 using MsbtLib;
 using System.Diagnostics;
 
@@ -138,6 +139,20 @@ namespace MSBTTests
             };
             msbt.SetTexts(texts);
             msbt.Write(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\DemoMsg\Demo006_0_fromscratch.msbt");
+        }
+        [TestMethod]
+        public void TestAllMSBTs()
+        {
+            Matcher matcher = new();
+            matcher.AddInclude("**/*.msbt");
+            IEnumerable<string> files = matcher.GetResultsInFullPath(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\");
+            foreach (string file in files)
+            {
+                Trace.WriteLine($"Loading {Path.GetFileName(file)}");
+                MSBT msbt = new(File.ReadAllBytes(file));
+                Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
+                Assert.IsNotNull(texts);
+            }
         }
     }
 }

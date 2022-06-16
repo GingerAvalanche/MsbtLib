@@ -57,17 +57,31 @@ namespace MsbtLib
             header = new(Encoding.ASCII.GetBytes(HEADER_MAGIC), new(endianness), 0, encoding, 3, 0, 0, 0x20, new byte[10]);
             section_order = new List<SectionTag>();
         }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public MSBT(byte[] data)
+        {
+            using MemoryStream stream = new(data);
+            Load(stream);
+        }
         public MSBT(Stream stream)
+        {
+            Load(stream);
+        }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        protected void Load(Stream stream)
         {
             using BinaryReader b_reader = new(stream);
             MsbtReader reader = new(b_reader);
             header = reader.Header;
             section_order = new();
-            while (true) {
-                if (reader.HasReachedEOF()) {
+            while (true)
+            {
+                if (reader.HasReachedEOF())
+                {
                     break;
                 }
-                switch (Encoding.UTF8.GetString(reader.Peek(4))) {
+                switch (Encoding.UTF8.GetString(reader.Peek(4)))
+                {
                     case "ATO1":
                         ato1 = reader.ReadAto1();
                         section_order.Add(SectionTag.Ato1);
