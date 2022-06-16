@@ -49,7 +49,11 @@ namespace MsbtLib
                     }
                     break;
                 case 2:
-                    return new Variable(tag_type, parameters); // until we figure out what a Variable's tag_type is for, I'm scorning Nintendo some more
+                    if (param_size > 0)
+                    {
+                        return new Variable(tag_type, parameters); // until we figure out what a Variable's tag_type is for, I'm scorning Nintendo some more
+                    }
+                    break;
                 case 3:
                     switch (tag_type)
                     {
