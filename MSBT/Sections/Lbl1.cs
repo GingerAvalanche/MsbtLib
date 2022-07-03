@@ -1,12 +1,10 @@
-﻿using JetBrains.Annotations;
-using System.Text;
+﻿using System.Text;
 
 namespace MsbtLib.Sections
 {
     internal class Lbl1 : ICalculatesSize, IUpdates
     {
         private readonly List<Label> _labels;
-        [NotNull]
         public readonly MSBT msbt;
         public SectionHeader section;
         public uint GroupCount { get => Math.Min(Convert.ToUInt32(((_labels.Count * 0.01f) + 1) * _labels.Count), 101); }
@@ -60,7 +58,6 @@ namespace MsbtLib.Sections
         static readonly uint HASH_MAGIC = 0x492;
         private string _name;
 
-        [NotNull]
         private readonly Lbl1 _lbl1;
         public string Name { get => _name; }
         public uint Index { get; set; }

@@ -1,10 +1,7 @@
-﻿using JetBrains.Annotations;
-
-namespace MsbtLib.Sections
+﻿namespace MsbtLib.Sections
 {
     internal class Nli1 : ICalculatesSize
     {
-        [NotNull]
         public SectionHeader section;
         public uint id_count;
         public Dictionary<uint, uint> global_ids;

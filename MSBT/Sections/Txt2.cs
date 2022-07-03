@@ -1,11 +1,8 @@
-﻿using JetBrains.Annotations;
-
-namespace MsbtLib.Sections
+﻿namespace MsbtLib.Sections
 {
     internal class Txt2 : ICalculatesSize, IUpdates
     {
         private readonly List<string> _strings;
-        [NotNull]
         public Header header;
         public SectionHeader section;
         public List<string> Strings { get => _strings; }

@@ -1,10 +1,7 @@
-﻿using JetBrains.Annotations;
-
-namespace MsbtLib.Sections
+﻿namespace MsbtLib.Sections
 {
     internal class Tsy1 : ICalculatesSize
     {
-        [NotNull]
         public SectionHeader section;
         public byte[] _unknown;
 

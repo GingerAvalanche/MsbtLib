@@ -1,5 +1,4 @@
 ﻿using MsbtLib.Sections;
-using JetBrains.Annotations;
 using System.Text;
 
 namespace MsbtLib
@@ -281,7 +280,7 @@ namespace MsbtLib
 
         public void SetEncoding(UTFEncoding encoding) => header.encoding = encoding;
         public void SetEndianness(Endianness endianness) => header.converter.SetEndianness(endianness);
-        public ulong PlusPadding(ulong size)
+        public static ulong PlusPadding(ulong size)
         {
             ulong rem = size % 16ul;
             if (rem > 0) {
