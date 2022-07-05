@@ -177,5 +177,13 @@ namespace MSBTTests
                 }
             }
         }
+        [TestMethod]
+        public void TestZora003_Talk08()
+        {
+            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_Zora003.msbt", FileMode.Open, FileAccess.Read));
+            Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
+            msbt.SetTexts(texts);
+            File.WriteAllBytes(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_Zora003_backup.msbt", msbt.Write());
+        }
     }
 }
