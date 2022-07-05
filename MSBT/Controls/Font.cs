@@ -5,6 +5,7 @@ namespace MsbtLib.Controls
     enum FontKind
     {
         Hylian = 0x0000,
+        Unknown = 0x0004,
         Normal = 0xFFFF
     }
     internal class Font : Control
@@ -24,13 +25,15 @@ namespace MsbtLib.Controls
             {
                 Face = FontKind.Normal;
             }
-            else if (str == "<font=Hylian>")
-            {
-                Face = FontKind.Hylian;
-            }
             else
             {
-                throw new ArgumentException("The only recognized font in BOTW is Hylian: <font=Hylian>. Or reset to normal font with </font>");
+                Regex pattern = new(@"<font=(\w+)>");
+                Match m = pattern.Match(str);
+                if (!m.Success)
+                {
+                    throw new ArgumentException("The only recognized font in BOTW is Hylian: <font=Hylian>. Or reset to normal font with </font>");
+                }
+                Face = (FontKind)Enum.Parse(typeof(FontKind), m.Groups[1].ToString());
             }
             param_size = 2;
         }
