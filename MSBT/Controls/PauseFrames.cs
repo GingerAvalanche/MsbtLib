@@ -17,12 +17,13 @@ namespace MsbtLib.Controls
         {
             Regex pattern = new(@"<pauseframes=(\d+)\s/>");
             Match m = pattern.Match(str);
-            if (!m.Success || uint.Parse(m.Groups[1].ToString()) > 65535)
+            bool success = uint.TryParse(m.Groups[1].ToString(), out uint temp);
+            if (!success || temp > 65535)
             {
                 throw new Exception("Proper usage: <pauseframes=# /> where # is a number of frames between 0 and 65535. Valid examples: <pauseframes=30 /> or <pauseframes=60 />");
             }
-            frames = uint.Parse(m.Groups[1].ToString());
-            param_size = 2;
+            frames = temp;
+            param_size = 4;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
