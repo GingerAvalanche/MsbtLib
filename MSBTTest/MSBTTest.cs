@@ -17,6 +17,13 @@ namespace MSBTTests
             Assert.AreEqual("Zora Helm", texts["Armor_063_Head_Name"].Value);
         }
         [TestMethod]
+        public void ReadAndTestMSBT_NoChanges_2()
+        {
+            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorUpper.msbt", FileMode.Open, FileAccess.Read));
+            Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
+            texts.Where(kvp => kvp.Key.StartsWith("Armor_5")).Select(kvp => kvp.Value.Value).ToList().ForEach(s => Trace.WriteLine(s));
+        }
+        [TestMethod]
         public void ReadAndLogMSBT_Color()
         {
             MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
@@ -148,7 +155,6 @@ namespace MSBTTests
             IEnumerable<string> files = matcher.GetResultsInFullPath(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\");
             foreach (string file in files)
             {
-                Trace.WriteLine($"Loading {Path.GetFileName(file)}");
                 MSBT msbt = new(File.ReadAllBytes(file));
                 Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
                 Assert.IsNotNull(texts);
