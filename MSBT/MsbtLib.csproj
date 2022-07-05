@@ -1,9 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <PackageId>MsbtLib</PackageId>
+    <Title>MsbtLib</Title>
+    <Version>0.9.0</Version>
+    <Authors>GingerAvalanche</Authors>
+    <Description>Package for loading and editing MSBT files</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/GingerAvalanche/MsbtLib</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>
