@@ -4,10 +4,13 @@ namespace MsbtLib.Controls
 {
     internal class RawControl : Control
     {
-        public ushort tag_group;
-        public ushort tag_type;
+        private ushort tag_group;
+        private ushort tag_type;
         private ushort param_size;
         private ushort[] field_1;
+        public ushort TagGroup { get => tag_group; set => tag_group = value; }
+        public ushort TagType { get => tag_type; set => tag_type = value; }
+        public ushort[] Field_1 { get => field_1; set { field_1 = value; param_size = (ushort)(field_1.Length * 2); } }
         public RawControl(ushort tag_group, ushort tag_type, List<ushort> parameters)
         {
             this.tag_group = tag_group;
@@ -24,7 +27,7 @@ namespace MsbtLib.Controls
         }
         public RawControl(string str)
         {
-            Regex pattern = new(@"<raw\sgroup=(\d+)\stype=(\d+)\sdata=""(.+)""\s/>");
+            Regex pattern = new(@"<raw\sgroup=(\d+)\stype=(\d+)\sdata=""(.*)""\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
@@ -42,7 +45,14 @@ namespace MsbtLib.Controls
                     throw new ArgumentException($"raw data field is invalid. All numbers must be between 0 and 65535, one was: {i}");
                 }
             }
-            field_1 = temp.Select(i => (ushort)i).ToArray();
+            if (temp.Count > 0)
+            {
+                field_1 = temp.Select(i => (ushort)i).ToArray();
+            }
+            else
+            {
+                field_1 = Array.Empty<ushort>();
+            }
             param_size = (ushort)(field_1.Length * 2);
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
