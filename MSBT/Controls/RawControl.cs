@@ -37,16 +37,17 @@ namespace MsbtLib.Controls
             }
             tag_group = ushort.Parse(m.Groups[1].ToString());
             tag_type = ushort.Parse(m.Groups[2].ToString());
-            List<int> temp = m.Groups[3].ToString().Split(" ").Select(s => int.Parse(s)).ToList();
-            foreach (int i in temp)
+            string tempStr = m.Groups[3].ToString();
+            if (!string.IsNullOrEmpty(tempStr))
             {
-                if (i < 0 || i > 65535)
+                List<int> temp = tempStr.Split(" ").Select(s => int.Parse(s)).ToList();
+                foreach (int i in temp)
                 {
-                    throw new ArgumentException($"raw data field is invalid. All numbers must be between 0 and 65535, one was: {i}");
+                    if (i < 0 || i > 65535)
+                    {
+                        throw new ArgumentException($"raw data field is invalid. All numbers must be between 0 and 65535, one was: {i}");
+                    }
                 }
-            }
-            if (temp.Count > 0)
-            {
                 field_1 = temp.Select(i => (ushort)i).ToArray();
             }
             else
