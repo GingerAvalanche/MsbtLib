@@ -10,7 +10,7 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndTestMSBT_NoChanges()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Assert.IsNotNull(texts);
             Assert.AreEqual(334, texts.Count);
@@ -19,35 +19,35 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndTestMSBT_NoChanges_2()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorUpper.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorUpper.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             texts.Where(kvp => kvp.Key.StartsWith("Armor_5")).Select(kvp => kvp.Value.Value).ToList().ForEach(s => Trace.WriteLine(s));
         }
         [TestMethod]
         public void ReadAndLogMSBT_Color()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["Armor_063_Head_Desc"].Value);
         }
         [TestMethod]
         public void ReadAndLogMSBT_Icon()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\LayoutMsg\MessageTipsPauseMenu_00.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\LayoutMsg\MessageTipsPauseMenu_00.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["0001"].Value);
         }
         [TestMethod]
         public void ReadAndLogMSBT_AutoAdvance()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\DemoMsg\Demo006_0.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\DemoMsg\Demo006_0.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["Talk00"].Value);
         }
         [TestMethod]
         public void ReadAndLogMSBT_Variable()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\Item.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\Item.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["Obj_ArrowBundle_A_10_Name"].Value);
             msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_AncientAssistant001.msbt", FileMode.Open, FileAccess.Read));
@@ -57,21 +57,21 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndLogMSBT_PausesAndSound()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\BalladOfHeroZora.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\BalladOfHeroZora.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["Npc_Zora003_SD_000"].Value);
         }
         [TestMethod]
         public void ReadAndLogMSBT_PausesAndSoundAndColorAndTextSizeAndChoice()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\BalladOfHeroZora.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\BalladOfHeroZora.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             Trace.WriteLine(texts["Npc_ZoraB001_SD_000"].Value);
         }
         [TestMethod]
         public void GetAndSetTexts_NoChanges()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             msbt.SetTexts(texts);
             texts = msbt.GetTexts();
@@ -82,7 +82,7 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndWriteMSBT_NoChanges()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
             msbt.Write(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead_written.msbt");
             msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead_written.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
@@ -95,7 +95,7 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndWriteMSBT_GetAndSetTexts_NoChanges()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\ActorType\ArmorHead.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts1 = msbt.GetTexts();
             Assert.IsNotNull(texts1);
             Assert.AreEqual(334, texts1.Count);
@@ -119,7 +119,7 @@ namespace MSBTTests
         [TestMethod]
         public void ReadAndWriteMSBT_GetAndSetTexts_AddOne()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\DemoMsg\Demo006_0.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\DemoMsg\Demo006_0.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             texts["Talk01"] = new("", "Okay, actually, that was kind of mean. I'm sorry.<auto_advance=30 />");
             msbt.SetTexts(texts);
@@ -131,7 +131,7 @@ namespace MSBTTests
         [TestMethod]
         public void MakeAndWriteMSBT()
         {
-            MSBT msbt = new(Endianness.Big, UTFEncoding.UTF16);
+            Msbt msbt = new(Endianness.Big, UtfEncoding.Utf16);
             msbt.CreateLbl1();
             msbt.CreateAtr1();
             msbt.CreateTxt2();
@@ -155,7 +155,7 @@ namespace MSBTTests
             IEnumerable<string> files = matcher.GetResultsInFullPath(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\");
             foreach (string file in files)
             {
-                MSBT msbt = new(File.ReadAllBytes(file));
+                Msbt msbt = new(File.ReadAllBytes(file));
                 Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
                 Assert.IsNotNull(texts);
             }
@@ -168,7 +168,7 @@ namespace MSBTTests
             IEnumerable<string> files = matcher.GetResultsInFullPath(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\");
             foreach (string file in files)
             {
-                MSBT msbt = new(File.ReadAllBytes(file));
+                Msbt msbt = new(File.ReadAllBytes(file));
                 Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
                 if (texts.ContainsKey("5502"))
                 {
@@ -180,10 +180,15 @@ namespace MSBTTests
         [TestMethod]
         public void TestZora003_Talk08()
         {
-            MSBT msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_Zora003.msbt", FileMode.Open, FileAccess.Read));
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_Zora003.msbt", FileMode.Open, FileAccess.Read));
             Dictionary<string, MsbtEntry> texts = msbt.GetTexts();
             msbt.SetTexts(texts);
             File.WriteAllBytes(@"E:\Users\chodn\Documents\CemuShit\botw2.0\Msg_USen.product\EventFlowMsg\Npc_Zora003_backup.msbt", msbt.Write());
+        }
+        [TestMethod]
+        public void TestTotkMsbt()
+        {
+            Msbt msbt = new(File.Open(@"E:\Users\chodn\Documents\ISOs - Switch\InstantTips_00.msbt", FileMode.Open, FileAccess.Read));
         }
     }
 }

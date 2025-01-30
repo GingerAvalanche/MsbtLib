@@ -1,16 +1,10 @@
 ﻿namespace MsbtLib.Sections
 {
-    internal class Tsy1 : ICalculatesSize
+    internal class Tsy1(SectionHeader section, byte[] unknownBytes) : ICalculatesSize
     {
-        public SectionHeader section;
-        public byte[] _unknown;
+        public readonly SectionHeader Section = section;
+        public readonly byte[] Unknown = unknownBytes;
 
-        public Tsy1(SectionHeader section, byte[] unknown_bytes)
-        {
-            this.section = section;
-            _unknown = unknown_bytes;
-        }
-
-        public ulong CalcSize() => section.CalcSize() + (ulong)_unknown.Length;
+        public ulong CalcSize() => Section.CalcSize() + (ulong)Unknown.Length;
     }
 }

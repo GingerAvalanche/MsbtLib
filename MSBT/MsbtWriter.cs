@@ -3,74 +3,67 @@ using System.Text;
 
 namespace MsbtLib
 {
-    internal class MsbtWriter
+    internal class MsbtWriter(Msbt msbt, BinaryWriter writer)
     {
-        public MSBT msbt;
-        public WriteCounter writer;
-
-        public MsbtWriter(MSBT msbt, BinaryWriter writer)
-        {
-            this.msbt = msbt;
-            this.writer = new WriteCounter(writer);
-        }
+        public readonly WriteCounter Writer = new(writer);
 
         public void WriteHeader()
         {
-            writer.Write(msbt.header.magic);
-            writer.Write(msbt.header.converter.Convert(0xFEFF));
-            writer.Write(msbt.header.converter.Convert(msbt.header._unknown_1));
-            writer.Write((byte)msbt.header.encoding);
-            writer.Write(msbt.header.version);
-            writer.Write(msbt.header.converter.Convert(msbt.header.section_count));
-            writer.Write(msbt.header.converter.Convert(msbt.header._unknown_2));
-            writer.Write(msbt.header.converter.Convert(msbt.header.file_size));
-            writer.Write(msbt.header.padding);
+            Writer.Write(msbt.Header.Magic);
+            Writer.Write(msbt.Header.Converter.Convert(0xFEFF));
+            Writer.Write(msbt.Header.Converter.Convert(msbt.Header.Unknown1));
+            Writer.Write((byte)msbt.Header.Encoding);
+            Writer.Write(msbt.Header.Version);
+            Writer.Write(msbt.Header.Converter.Convert(msbt.Header.SectionCount));
+            Writer.Write(msbt.Header.Converter.Convert(msbt.Header.Unknown2));
+            Writer.Write(msbt.Header.Converter.Convert(msbt.Header.FileSize));
+            Writer.Write(msbt.Header.Padding);
         }
 
-        public void WriteSection(SectionHeader section)
+        private void WriteSection(SectionHeader section)
         {
-            writer.Write(section.magic);
-            writer.Write(msbt.header.converter.Convert(section.size));
-            writer.Write(section.padding);
+            Writer.Write(section.Magic);
+            Writer.Write(msbt.Header.Converter.Convert(section.Size));
+            Writer.Write(section.Padding);
         }
 
-        public void WriteGroup(Group group)
+        private void WriteGroup(Group group)
         {
-            writer.Write(msbt.header.converter.Convert(group.label_count));
-            writer.Write(msbt.header.converter.Convert(group.offset));
+            Writer.Write(msbt.Header.Converter.Convert(group.LabelCount));
+            Writer.Write(msbt.Header.Converter.Convert(group.Offset));
         }
 
-        public void WriteLabel(Label label)
+        private void WriteLabel(Label label)
         {
-            writer.Write((byte)label.Name.Length);
-            writer.Write(Encoding.ASCII.GetBytes(label.Name));
-            writer.Write(msbt.header.converter.Convert(label.Index));
+            Writer.Write((byte)label.Name.Length);
+            Writer.Write(Encoding.ASCII.GetBytes(label.Name));
+            Writer.Write(msbt.Header.Converter.Convert(label.Index));
         }
 
         public void WriteAto1(Ato1 ato1)
         {
-            WriteSection(ato1.section);
-            writer.Write(ato1._unknown);
+            WriteSection(ato1.Section);
+            Writer.Write(ato1.Unknown);
             WritePadding();
         }
 
         public void WriteAtr1(Atr1 atr1)
         {
-            WriteSection(atr1.section);
-            writer.Write(msbt.header.converter.Convert((uint)atr1.Strings.Count));
-            writer.Write(msbt.header.converter.Convert(atr1._unknown_1));
+            WriteSection(atr1.Section);
+            Writer.Write(msbt.Header.Converter.Convert((uint)atr1.Strings.Count));
+            Writer.Write(msbt.Header.Converter.Convert(atr1.Unknown1));
             if (atr1.Strings.Any(s => !string.IsNullOrEmpty(s)))
             {
                 uint offset = sizeof(uint) * ((uint)atr1.Strings.Count + 2u); // sizeof(string_count) + sizeof(_unknown_1) + sizeof(uint) * string_count
-                List<byte[]> raw_strings = atr1.Strings.Select(s => Util.StringToRaw(s, msbt.header.encoding, msbt.header.converter).ToArray()).ToList();
-                foreach (byte[] s in raw_strings)
+                List<byte[]> rawStrings = atr1.Strings.Select(s => Util.StringToRaw(s, msbt.Header.Encoding, msbt.Header.Converter).ToArray()).ToList();
+                foreach (byte[] s in rawStrings)
                 {
-                    writer.Write(msbt.header.converter.Convert(offset));
+                    Writer.Write(msbt.Header.Converter.Convert(offset));
                     offset += (uint)s.Length;
                 }
-                foreach (byte[] s in raw_strings)
+                foreach (byte[] s in rawStrings)
                 {
-                    writer.Write(s);
+                    Writer.Write(s);
                 }
             }
             WritePadding();
@@ -78,33 +71,33 @@ namespace MsbtLib
 
         public void WriteLbl1(Lbl1 lbl1)
         {
-            WriteSection(lbl1.section);
+            WriteSection(lbl1.Section);
             List<List<Label>> groups = new();
             foreach (var _ in Enumerable.Range(0, (int)lbl1.GroupCount))
             {
                 groups.Add(new());
             }
             lbl1.Labels.ForEach(l => groups[l.GroupNum()].Add(l));
-            writer.Write(msbt.header.converter.Convert(lbl1.GroupCount));
+            Writer.Write(msbt.Header.Converter.Convert(lbl1.GroupCount));
             uint offset = (lbl1.GroupCount * 8) + 4;
             groups.ForEach(g => {
                 WriteGroup(new((uint)g.Count, offset));
                 offset += (uint)g.Select(l => (long)l.CalcSize()).Sum();
             });
-            lbl1.Labels.ForEach(label => WriteLabel(label));
+            lbl1.Labels.ForEach(WriteLabel);
             WritePadding();
         }
 
         public void WriteNli1(Nli1 nli1)
         {
-            WriteSection(nli1.section);
-            if (nli1.section.size > 0)
+            WriteSection(nli1.Section);
+            if (nli1.Section.Size > 0)
             {
-                writer.Write(msbt.header.converter.Convert(nli1.id_count));
-                foreach (KeyValuePair<uint, uint> kvp in nli1.global_ids)
+                Writer.Write(msbt.Header.Converter.Convert(nli1.IdCount));
+                foreach (KeyValuePair<uint, uint> kvp in nli1.GlobalIds)
                 {
-                    writer.Write(msbt.header.converter.Convert(kvp.Value));
-                    writer.Write(msbt.header.converter.Convert(kvp.Key));
+                    Writer.Write(msbt.Header.Converter.Convert(kvp.Value));
+                    Writer.Write(msbt.Header.Converter.Convert(kvp.Key));
                 }
             }
             WritePadding();
@@ -112,85 +105,79 @@ namespace MsbtLib
 
         public void WriteTsy1(Tsy1 tsy1)
         {
-            WriteSection(tsy1.section);
-            writer.Write(tsy1._unknown);
+            WriteSection(tsy1.Section);
+            Writer.Write(tsy1.Unknown);
             WritePadding();
         }
 
         public void WriteTxt2(Txt2 txt2)
         {
-            WriteSection(txt2.section);
-            writer.Write(msbt.header.converter.Convert((uint)txt2.Strings.Count));
+            WriteSection(txt2.Section);
+            Writer.Write(msbt.Header.Converter.Convert((uint)txt2.Strings.Count));
             uint total = 0;
-            List<byte[]> raw_strings = txt2.Strings.Select(s => Util.StringToRaw(s, msbt.header.encoding, msbt.header.converter).ToArray()).ToList();
-            foreach (byte[] s in raw_strings)
+            List<byte[]> rawStrings = txt2.Strings.Select(s => Util.StringToRaw(s, msbt.Header.Encoding, msbt.Header.Converter).ToArray()).ToList();
+            foreach (byte[] s in rawStrings)
             {
                 uint offset = (uint)txt2.Strings.Count * 4u + 4u + total;
                 total += (uint)s.Length;
-                writer.Write(msbt.header.converter.Convert(offset));
+                Writer.Write(msbt.Header.Converter.Convert(offset));
             }
-            foreach (byte[] s in raw_strings)
+            foreach (byte[] s in rawStrings)
             {
-                writer.Write(s);
+                Writer.Write(s);
             }
             WritePadding();
         }
 
-        public void WritePadding()
+        private void WritePadding()
         {
-            ulong rem = writer.written % MSBT.PADDING_LENGTH;
+            ulong rem = Writer.Written % Msbt.PaddingLength;
             if (rem == 0ul)
             {
                 return;
             }
-            writer.Write(new byte[MSBT.PADDING_LENGTH - rem].Fill(MSBT.PADDING_CHAR));
+            Writer.Write(new byte[Msbt.PaddingLength - rem].Fill(Msbt.PaddingChar));
         }
     }
 
-    internal class WriteCounter
+    internal class WriteCounter(BinaryWriter writer)
     {
-        public ulong written;
-        public BinaryWriter writer;
-
-        public WriteCounter(BinaryWriter writer)
-        {
-            this.writer = writer;
-            written = 0ul;
-        }
+        public ulong Written;
+        public readonly BinaryWriter Writer = writer;
 
         public ulong Write(byte[] buf)
         {
-            writer.Write(buf);
+            Writer.Write(buf);
             ulong num = (ulong)buf.Length;
-            written += num;
+            Written += num;
             return num;
         }
 
         public ulong Write(byte b)
         {
-            writer.Write(b);
-            written += 1ul;
+            Writer.Write(b);
+            Written += 1ul;
             return 1ul;
         }
 
         public ulong Write(ushort u16)
         {
-            writer.Write(u16);
-            written += 2ul;
+            Writer.Write(u16);
+            Written += 2ul;
             return 2ul;
         }
 
         public ulong Write(uint u32)
         {
-            writer.Write(u32);
-            written += 4ul;
+            Writer.Write(u32);
+            Written += 4ul;
             return 4ul;
         }
 
         public ulong Write(ulong u64)
         {
-            writer.Write(u64);
-            written += 8ul;
+            Writer.Write(u64);
+            Written += 8ul;
             return 8ul;
         }
     }

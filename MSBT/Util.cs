@@ -2,7 +2,7 @@
 
 namespace MsbtLib
 {
-    class Util
+    internal static class Util
     {
         public static ushort ReverseBytes(ushort val)
         {
@@ -32,16 +32,15 @@ namespace MsbtLib
         {
             return s + char.MinValue;
         }
-        public static List<byte> StringToRaw(string input, UTFEncoding encoding, EndiannessConverter converter)
+        public static List<byte> StringToRaw(string input, UtfEncoding encoding, EndiannessConverter converter)
         {
-            char control = '<';
             Queue<char> queue = new(AppendNull(input));
-            List<byte> bytes = new();
-            List<char> sequence = new();
+            List<byte> bytes = new(input.Length);
+            List<char> sequence = new(input.Length);
             while (queue.Count > 0)
             {
                 char c = queue.Dequeue();
-                if (c == control)
+                if (c == '<')
                 {
                     char lastChar = c;
                     sequence.Clear();
@@ -57,10 +56,10 @@ namespace MsbtLib
                 {
                     switch (encoding)
                     {
-                        case UTFEncoding.UTF16:
+                        case UtfEncoding.Utf16:
                             bytes.AddRange(converter.GetBytes(c));
                             break;
-                        case UTFEncoding.UTF8:
+                        case UtfEncoding.Utf8:
                             bytes.Add(Convert.ToByte(c));
                             break;
                     }
@@ -68,28 +67,28 @@ namespace MsbtLib
             }
             return bytes;
         }
-        public static string RawToString(List<byte> input, UTFEncoding encoding, EndiannessConverter converter)
+        public static string RawToString(List<byte> input, UtfEncoding encoding, EndiannessConverter converter)
         {
             char control = '\u000E';
-            Queue<byte> queue = new(input);
-            List<char> chars = new();
+            VariableByteQueue queue = new(input, converter.Endianness);
+            StringBuilder str = new();
             while (queue.Count > 0)
             {
                 char c = encoding switch
                 {
-                    UTFEncoding.UTF16 => Convert.ToChar(converter.Convert(queue.DequeueUInt16())),
-                    _ => Convert.ToChar(queue.Dequeue()),
+                    UtfEncoding.Utf16 => Convert.ToChar(queue.DequeueU16()),
+                    _ => Convert.ToChar(queue.DequeueU8()),
                 };
                 if (c == control)
                 {
-                    chars.AddRange(Control.GetControl(ref queue, converter).ToControlString());
+                    str.Append(Control.GetControl(ref queue).ToControlString());
                 }
                 else
                 {
-                    chars.Add(c);
+                    str.Append(c);
                 }
             }
-            return StripNull(string.Join("", chars));
+            return StripNull(str.ToString());
         }
     }
 }

@@ -1,20 +1,18 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls
+namespace MsbtLib.Controls.Three
 {
     internal class Sound : Control
     {
-        public const ushort tag_group = 0x0003;
-        public const ushort tag_type = 0x0001;
-        private ushort param_size;
-        private byte field_1;
-        private byte field_2;
-        public Sound(List<ushort> parameters)
+        public const ushort TagType = 0x0001;
+        private const ushort ParamSize = 2;
+        private readonly byte _field1;
+        private readonly byte _field2;
+        public Sound(ref VariableByteQueue queue)
         {
-            param_size = parameters[0];
-            byte[] temp = BitConverter.GetBytes(parameters[1]);
-            field_1 = temp[0];
-            field_2 = temp[1];
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Sound parameter size mismatch");
+            _field1 = queue.DequeueU8();
+            _field2 = queue.DequeueU8();
         }
         public Sound(string str)
         {
@@ -25,33 +23,32 @@ namespace MsbtLib.Controls
                 throw new ArgumentException("Proper usage: <sound field_1=# field_2=# /> where # are both integers. Valid example: <sound field_1=5 field_2=4 />");
             }
             int temp = int.Parse(m.Groups[1].ToString());
-            if (temp < 0 || temp > 255)
+            if (temp is < 0 or > 255)
             {
                 throw new ArgumentException($"Sound field_1 is invalid. Must be a number between 0 and 255, was: {temp}");
             }
-            field_1 = (byte)temp;
+            _field1 = (byte)temp;
             temp = int.Parse(m.Groups[2].ToString());
-            if (temp < 0 || temp > 255)
+            if (temp is < 0 or > 255)
             {
                 throw new ArgumentException($"Sound field_2 is invalid. Must be a number between 0 and 255, was: {temp}");
             }
-            field_2 = (byte)temp;
-            param_size = 2;
+            _field2 = (byte)temp;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] bytes = new byte[param_size + 8];
-            bytes.Merge(converter.GetBytes(control_tag), 0);
-            bytes.Merge(converter.GetBytes(tag_group), 2);
-            bytes.Merge(converter.GetBytes(tag_type), 4);
-            bytes.Merge(converter.GetBytes(param_size), 6);
-            bytes[8] = field_1;
-            bytes[9] = field_2;
+            byte[] bytes = new byte[ParamSize + 8];
+            bytes.Merge(converter.GetBytes(ControlTag), 0);
+            bytes.Merge(converter.GetBytes(ThreeTag.Group), 2);
+            bytes.Merge(converter.GetBytes(TagType), 4);
+            bytes.Merge(converter.GetBytes(ParamSize), 6);
+            bytes[8] = _field1;
+            bytes[9] = _field2;
             return bytes;
         }
         public override string ToControlString()
         {
-            return $"<sound field_1={field_1} field_2={field_2} />";
+            return $"<sound field_1={_field1} field_2={_field2} />";
         }
     }
 }

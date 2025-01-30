@@ -1,18 +1,17 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls
+namespace MsbtLib.Controls.Four
 {
     internal class Sound2 : Control
     {
-        public const ushort tag_group = 0x0004;
-        public const ushort tag_type = 0x0001;
-        private ushort param_size;
-        private byte field_1;
-        public Sound2(List<ushort> parameters)
+        public const ushort TagType = 0x0001;
+        private const ushort ParamSize = 2;
+        private readonly byte _field1;
+        public Sound2(ref VariableByteQueue queue)
         {
-            param_size = parameters[0];
-            byte[] temp = BitConverter.GetBytes(parameters[1]);
-            field_1 = temp[0];
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Sound2 parameter size mismatch");
+            _field1 = queue.DequeueU8();
+            if (queue.DequeueU8() != 0xCD) throw new InvalidDataException("Sound2 ending byte not 0xCD");
         }
         public Sound2(string str)
         {
@@ -27,23 +26,22 @@ namespace MsbtLib.Controls
             {
                 throw new ArgumentException($"Sound2 field is invalid. Must be a number between 0 and 255, was: {temp}");
             }
-            field_1 = (byte)temp;
-            param_size = 2;
+            _field1 = (byte)temp;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] bytes = new byte[param_size + 8];
-            bytes.Merge(converter.GetBytes(control_tag), 0);
-            bytes.Merge(converter.GetBytes(tag_group), 2);
-            bytes.Merge(converter.GetBytes(tag_type), 4);
-            bytes.Merge(converter.GetBytes(param_size), 6);
-            bytes[8] = field_1;
+            byte[] bytes = new byte[ParamSize + 8];
+            bytes.Merge(converter.GetBytes(ControlTag), 0);
+            bytes.Merge(converter.GetBytes(FourTag.Group), 2);
+            bytes.Merge(converter.GetBytes(TagType), 4);
+            bytes.Merge(converter.GetBytes(ParamSize), 6);
+            bytes[8] = _field1;
             bytes[9] = 0xCD;
             return bytes;
         }
         public override string ToControlString()
         {
-            return $"<sound2={field_1} />";
+            return $"<sound2={_field1} />";
         }
     }
 }

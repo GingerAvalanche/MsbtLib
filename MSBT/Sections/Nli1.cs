@@ -1,25 +1,19 @@
 ﻿namespace MsbtLib.Sections
 {
-    internal class Nli1 : ICalculatesSize
+    internal class Nli1(SectionHeader section, uint idCount, Dictionary<uint, uint> globalIds)
+        : ICalculatesSize
     {
-        public SectionHeader section;
-        public uint id_count;
-        public Dictionary<uint, uint> global_ids;
-
-        public Nli1(SectionHeader section, uint id_count, Dictionary<uint, uint> global_ids)
-        {
-            this.section = section;
-            this.id_count = id_count;
-            this.global_ids = global_ids;
-        }
+        public readonly SectionHeader Section = section;
+        public readonly uint IdCount = idCount;
+        public readonly Dictionary<uint, uint> GlobalIds = globalIds;
 
         public ulong CalcSize()
         {
-            ulong size = section.CalcSize();
-            if (global_ids.Count > 0)
+            ulong size = Section.CalcSize();
+            if (GlobalIds.Count > 0)
             {
                 size += (ulong)(sizeof(uint) // Marshal.SizeOf(id_count)
-                    + sizeof(uint) * global_ids.Count * 2);
+                    + sizeof(uint) * GlobalIds.Count * 2);
             }
             return size;
         }

@@ -3,23 +3,21 @@
     internal class Atr1 : ICalculatesSize, IUpdates
     {
         private readonly List<string> _strings;
-        public Header header;
-        public SectionHeader section;
-        public uint _unknown_1;
-        public List<string> Strings { get => _strings; }
+        public readonly Header Header;
+        public readonly SectionHeader Section;
+        public uint Unknown1;
+        public List<string> Strings => _strings;
 
-        public Atr1(Header header, SectionHeader section, uint string_count, uint _unknown_1, List<string> strings)
+        public Atr1(Header header, SectionHeader section, uint stringCount, uint unknown1, List<string> strings)
         {
-            this.header = header;
-            this.section = section;
-            this._unknown_1 = _unknown_1;
+            Header = header;
+            Section = section;
+            Unknown1 = unknown1;
             _strings = strings;
-            if (strings.Count == 0)
+            long toAdd = stringCount - strings.Count;
+            for (int i = 0; i < toAdd; i++)
             {
-                for (int i = 0; i < string_count; i++)
-                {
-                    strings.Add(string.Empty);
-                }
+                strings.Add(string.Empty);
             }
         }
 
@@ -45,23 +43,23 @@
             if (_strings.Any(s => !string.IsNullOrEmpty(s)))
             {
                 size += (uint)(sizeof(uint) * _strings.Count // offsets
-                    + _strings.Select(s => Util.StringToRaw(s, header.encoding, header.converter).Count).Sum());
-                _unknown_1 = 4;
+                    + _strings.Select(s => Util.StringToRaw(s, Header.Encoding, Header.Converter).Count).Sum());
+                Unknown1 = 4;
             }
             else
             {
-                _unknown_1 = 0;
+                Unknown1 = 0;
             }
-            section.size = size;
+            Section.Size = size;
         }
 
         public ulong CalcSize()
         {
-            ulong size = section.CalcSize() + sizeof(uint) * 2; // Marshal.SizeOf(_unknown_1) + Marshal.SizeOf(_unknown_1)
+            ulong size = Section.CalcSize() + sizeof(uint) * 2; // Marshal.SizeOf(_unknown_1) + Marshal.SizeOf(_unknown_1)
             if (_strings.Any(s => !string.IsNullOrEmpty(s)))
             {
                 size += (ulong)(sizeof(uint) * _strings.Count // offsets
-                    + _strings.Select(s => Util.StringToRaw(s, header.encoding, header.converter).Count).Sum());
+                    + _strings.Select(s => Util.StringToRaw(s, Header.Encoding, Header.Converter).Count).Sum());
             }
             return size;
         }

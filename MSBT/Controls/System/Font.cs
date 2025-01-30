@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls
+namespace MsbtLib.Controls.System
 {
     enum FontKind
     {
@@ -10,20 +10,19 @@ namespace MsbtLib.Controls
     }
     internal class Font : Control
     {
-        public const ushort tag_group = 0x0000;
-        public const ushort tag_type = 0x0001;
-        private ushort param_size;
-        private FontKind Face;
-        public Font(List<ushort> parameters)
+        public const ushort TagType = 0x0001;
+        private const ushort ParamSize = 2;
+        private readonly FontKind _face;
+        public Font(ref VariableByteQueue queue)
         {
-            param_size = parameters[0];
-            Face = (FontKind)parameters[1];
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Font parameter size mismatch");
+            _face = (FontKind)queue.DequeueU16();
         }
         public Font(string str)
         {
             if (str == "</font>")
             {
-                Face = FontKind.Normal;
+                _face = FontKind.Normal;
             }
             else
             {
@@ -33,27 +32,26 @@ namespace MsbtLib.Controls
                 {
                     throw new ArgumentException("The only recognized font in BOTW is Hylian: <font=Hylian>. Or reset to normal font with </font>");
                 }
-                Face = (FontKind)Enum.Parse(typeof(FontKind), m.Groups[1].ToString());
+                _face = (FontKind)Enum.Parse(typeof(FontKind), m.Groups[1].ToString());
             }
-            param_size = 2;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] bytes = new byte[param_size + 8];
-            bytes.Merge(converter.GetBytes(control_tag), 0);
-            bytes.Merge(converter.GetBytes(tag_group), 2);
-            bytes.Merge(converter.GetBytes(tag_type), 4);
-            bytes.Merge(converter.GetBytes(param_size), 6);
-            bytes.Merge(converter.GetBytes((ushort)Face), 8);
+            byte[] bytes = new byte[ParamSize + 8];
+            bytes.Merge(converter.GetBytes(ControlTag), 0);
+            bytes.Merge(converter.GetBytes(SystemTag.Group), 2);
+            bytes.Merge(converter.GetBytes(TagType), 4);
+            bytes.Merge(converter.GetBytes(ParamSize), 6);
+            bytes.Merge(converter.GetBytes((ushort)_face), 8);
             return bytes;
         }
         public override string ToControlString()
         {
-            if (Face == FontKind.Normal)
+            if (_face == FontKind.Normal)
             {
                 return "</font>";
             }
-            return $"<font={Face}>";
+            return $"<font={_face}>";
         }
     }
 }

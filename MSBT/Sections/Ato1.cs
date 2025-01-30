@@ -1,16 +1,10 @@
 ﻿namespace MsbtLib.Sections
 {
-    internal class Ato1 : ICalculatesSize
+    internal class Ato1(SectionHeader section, byte[] bytes) : ICalculatesSize
     {
-        public SectionHeader section;
-        public byte[] _unknown;
+        public readonly SectionHeader Section = section;
+        public readonly byte[] Unknown = bytes;
 
-        public Ato1(SectionHeader section, byte[] bytes)
-        {
-            this.section = section;
-            _unknown = bytes;
-        }
-
-        public ulong CalcSize() => section.CalcSize() + (ulong)_unknown.Length;
+        public ulong CalcSize() => Section.CalcSize() + (ulong)Unknown.Length;
     }
 }

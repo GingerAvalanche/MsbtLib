@@ -1,9 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls
+namespace MsbtLib.Controls.EUI
 {
     enum IconType
     {
+        // ReSharper disable once InconsistentNaming
         ZL,
         L,
         R,
@@ -33,8 +34,8 @@ namespace MsbtLib.Controls
     }
     internal class Icon : Control
     {
-        private static readonly IconType[] iconTypes = new IconType[]
-        {
+        private static readonly IconType[] IconTypes =
+        [
             IconType.LStickForward,
             IconType.LStickBack,
             IconType.LStickLeft,
@@ -73,17 +74,17 @@ namespace MsbtLib.Controls
             IconType.Unknown,
             IconType.Gamepad,
             IconType.X,
-            IconType.X,
-        };
-        public const ushort tag_group = 0x0001;
-        public const ushort tag_type = 0x0007;
-        private ushort param_size;
-        private byte num;
-        public Icon(List<ushort> parameters)
+            IconType.X
+        ];
+
+        public const ushort TagType = 0x0007;
+        private const ushort ParamSize = 2;
+        private readonly byte _num;
+        public Icon(ref VariableByteQueue queue)
         {
-            param_size = parameters[0];
-            byte[] param_bytes = BitConverter.GetBytes(parameters[1]);
-            num = param_bytes[0] == 0xCD ? param_bytes[1] : param_bytes[0];
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Icon parameter size mismatch");
+            _num = queue.DequeueU8();
+            if (queue.DequeueU8() != 0xCD) throw new InvalidDataException("Icon ending byte not 0xCD");
         }
         public Icon(string str)
         {
@@ -95,7 +96,7 @@ namespace MsbtLib.Controls
             }
             string parsedKey = m.Groups[1].ToString();
             IconType icon = (IconType)Enum.Parse(typeof(IconType), parsedKey);
-            if (icon == IconType.A || icon == IconType.X || icon == IconType.ZL || icon == IconType.Unknown)
+            if (icon is IconType.A or IconType.X or IconType.ZL or IconType.Unknown)
             {
                 string byteStr = m.Groups[2].ToString();
                 if (String.IsNullOrEmpty(byteStr))
@@ -103,13 +104,13 @@ namespace MsbtLib.Controls
                     throw new Exception($"IconType.{icon} requires a specified key, for example A(10) or ZL(15)");
                 }
                 int parsedNum = int.Parse(byteStr);
-                if (parsedNum < 0 || parsedNum > 255)
+                if (parsedNum is < 0 or > 255)
                 {
                     throw new Exception($"Icon keys must be 1 unsigned byte. i.e. Their value must be >=0 and <=255.");
                 }
-                if (iconTypes[parsedNum] == icon || parsedNum >= iconTypes.Length)
+                if (IconTypes[parsedNum] == icon || parsedNum >= IconTypes.Length)
                 {
-                    num = (byte)parsedNum;
+                    _num = (byte)parsedNum;
                 }
                 else
                 {
@@ -118,28 +119,27 @@ namespace MsbtLib.Controls
             }
             else
             {
-                num = (byte)Array.IndexOf(iconTypes, icon);
+                _num = (byte)Array.IndexOf(IconTypes, icon);
             }
-            param_size = 2;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] bytes = new byte[param_size + 8];
-            bytes.Merge(converter.GetBytes(control_tag), 0);
-            bytes.Merge(converter.GetBytes(tag_group), 2);
-            bytes.Merge(converter.GetBytes(tag_type), 4);
-            bytes.Merge(converter.GetBytes(param_size), 6);
-            bytes[8] = num;
+            byte[] bytes = new byte[ParamSize + 8];
+            bytes.Merge(converter.GetBytes(ControlTag), 0);
+            bytes.Merge(converter.GetBytes(EuiTag.Group), 2);
+            bytes.Merge(converter.GetBytes(TagType), 4);
+            bytes.Merge(converter.GetBytes(ParamSize), 6);
+            bytes[8] = _num;
             bytes[9] = 0xCD;
             return bytes;
         }
         public override string ToControlString()
         {
-            IconType icon = num < iconTypes.Length ? iconTypes[num] : IconType.Unknown;
+            IconType icon = _num < IconTypes.Length ? IconTypes[_num] : IconType.Unknown;
             string numStr = $"";
-            if (icon == IconType.A || icon == IconType.X || icon == IconType.ZL || icon == IconType.Unknown)
+            if (icon is IconType.A or IconType.X or IconType.ZL or IconType.Unknown)
             {
-                numStr = $"({num})";
+                numStr = $"({_num})";
             }
             return $"<icon={icon}{numStr} />";
         }

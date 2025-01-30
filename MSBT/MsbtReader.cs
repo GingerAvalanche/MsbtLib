@@ -5,85 +5,83 @@ namespace MsbtLib
 {
     class MsbtReader
     {
-        private readonly ReadCounter reader;
-        private readonly Header header;
-        public Header Header { get => header; }
+        private readonly ReadCounter _reader;
+        public Header Header { get; }
 
         public MsbtReader(BinaryReader reader)
         {
-            this.reader = new ReadCounter(reader);
-            header = ReadHeader();
+            _reader = new ReadCounter(reader);
+            Header = ReadHeader();
         }
 
-        public Header ReadHeader()
+        private Header ReadHeader()
         {
-            byte[] magic = reader.Read(8);
-            if (Encoding.ASCII.GetString(magic) != MSBT.HEADER_MAGIC) {
+            byte[] magic = _reader.Read(8);
+            if (Encoding.ASCII.GetString(magic) != Msbt.HeaderMagic) {
                 throw new MsbtException.InvalidMagicException(Encoding.ASCII.GetString(magic));
             }
 
-            EndiannessConverter converter = reader.ReadU16() switch {
+            EndiannessConverter converter = _reader.ReadU16() switch {
                 0xFEFF => new(Endianness.Little),
                 0xFFFE => new(Endianness.Big),
                 _ => throw new MsbtException.InvalidBomException(),
             };
 
-            ushort _unknown_1 = converter.Convert(reader.ReadU16());
-            UTFEncoding encoding = reader.ReadByte() switch {
-                0 => UTFEncoding.UTF8,
-                1 => UTFEncoding.UTF16,
+            ushort unknown1 = converter.Convert(_reader.ReadU16());
+            UtfEncoding encoding = _reader.ReadByte() switch {
+                0 => UtfEncoding.Utf8,
+                1 => UtfEncoding.Utf16,
                 _ => throw new MsbtException.InvalidEncodingException(),
             };
 
-            byte version = reader.ReadByte();
-            ushort section_count = converter.Convert(reader.ReadU16());
-            ushort _unknown_2 = converter.Convert(reader.ReadU16());
-            uint file_size = converter.Convert(reader.ReadU32());
-            byte[] padding = reader.Read(10);
-            return new Header(magic, converter, _unknown_1, encoding, version, section_count, _unknown_2, file_size, padding);
+            byte version = _reader.ReadByte();
+            ushort sectionCount = converter.Convert(_reader.ReadU16());
+            ushort unknown2 = converter.Convert(_reader.ReadU16());
+            uint fileSize = converter.Convert(_reader.ReadU32());
+            byte[] padding = _reader.Read(10);
+            return new Header(magic, converter, unknown1, encoding, version, sectionCount, unknown2, fileSize, padding);
         }
         public Ato1 ReadAto1()
         {
             SectionHeader section = ReadSectionHeader();
-            byte[] _unknown = reader.Read(section.size);
-            return new(section, _unknown);
+            byte[] unknown = _reader.Read(section.Size);
+            return new(section, unknown);
         }
         public Atr1 ReadAtr1()
         {
             SectionHeader section = ReadSectionHeader();
-            uint string_count = header.converter.Convert(reader.ReadU32());
-            uint _unknown_1 = header.converter.Convert(reader.ReadU32());
+            uint stringCount = Header.Converter.Convert(_reader.ReadU32());
+            uint unknown1 = Header.Converter.Convert(_reader.ReadU32());
             List<string> strings = new();
-            if (section.size > 8u) {
+            if (section.Size > 8u) {
                 List<uint> offsets = new();
-                foreach (var _ in Enumerable.Range(0, (int)string_count)) {
-                    offsets.Add(header.converter.Convert(reader.ReadU32()));
+                foreach (var _ in Enumerable.Range(0, (int)stringCount)) {
+                    offsets.Add(Header.Converter.Convert(_reader.ReadU32()));
                 }
-                foreach (var i in Enumerable.Range(0, (int)string_count)) {
-                    uint str_end = i == string_count - 1u ? section.size : offsets[i + 1];
-                    strings.Add(Util.RawToString(reader.Read(str_end - offsets[i]).ToList(), header.encoding, header.converter));
+                foreach (var i in Enumerable.Range(0, (int)stringCount)) {
+                    uint strEnd = i == stringCount - 1u ? section.Size : offsets[i + 1];
+                    strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]).ToList(), Header.Encoding, Header.Converter));
                 }
             }
-            return new Atr1(header, section, string_count, _unknown_1, strings);
+            return new Atr1(Header, section, stringCount, unknown1, strings);
         }
-        public Lbl1 ReadLbl1(MSBT msbt)
+        public Lbl1 ReadLbl1(Msbt msbt)
         {
             SectionHeader section = ReadSectionHeader();
-            uint group_count = header.converter.Convert(reader.ReadU32());
+            uint groupCount = Header.Converter.Convert(_reader.ReadU32());
             Lbl1 lbl1 = new(msbt, section);
 
             List<Group> groups = new();
-            foreach (var _ in Enumerable.Range(0, (int)group_count)) {
+            foreach (var _ in Enumerable.Range(0, (int)groupCount)) {
                 groups.Add(ReadGroup());
             }
 
-            List<Label> labels = new(groups.Select(g => (int)g.label_count).Sum());
-            foreach (var (group, i) in groups.Select((group, i) => (group, i))) {
-                foreach (var _ in Enumerable.Range(0, (int)group.label_count)) {
-                    ulong str_len = reader.ReadByte();
-                    string name = Encoding.UTF8.GetString(reader.Read(str_len));
-                    uint index = header.converter.Convert(reader.ReadU32());
-                    uint checksum = (uint)i;
+            List<Label> labels = new(groups.Select(g => (int)g.LabelCount).Sum());
+            foreach (var (group, _) in groups.Select((group, i) => (group, i))) {
+                foreach (var _ in Enumerable.Range(0, (int)group.LabelCount)) {
+                    ulong strLen = _reader.ReadByte();
+                    string name = Encoding.UTF8.GetString(_reader.Read(strLen));
+                    uint index = Header.Converter.Convert(_reader.ReadU32());
                     labels.Add(new Label(lbl1, name, index));
                 }
             }
@@ -94,85 +92,81 @@ namespace MsbtLib
         public Nli1 ReadNli1()
         {
             SectionHeader section = ReadSectionHeader();
-            Dictionary<uint, uint> global_ids = new();
-            uint id_count = 0;
-            if (section.size > 0u) {
-                id_count = header.converter.Convert(reader.ReadU32());
-                foreach (var _ in Enumerable.Range(0, (int)id_count)) {
-                    uint val = header.converter.Convert(reader.ReadU32());
-                    uint key = header.converter.Convert(reader.ReadU32());
-                    global_ids[key] = val;
+            Dictionary<uint, uint> globalIds = new();
+            uint idCount = 0;
+            if (section.Size > 0u) {
+                idCount = Header.Converter.Convert(_reader.ReadU32());
+                foreach (var _ in Enumerable.Range(0, (int)idCount)) {
+                    uint val = Header.Converter.Convert(_reader.ReadU32());
+                    uint key = Header.Converter.Convert(_reader.ReadU32());
+                    globalIds[key] = val;
                 }
             }
-            return new Nli1(section, id_count, global_ids);
+            return new Nli1(section, idCount, globalIds);
         }
         public Tsy1 ReadTsy1()
         {
             SectionHeader section = ReadSectionHeader();
-            byte[] _unknown = reader.Read(section.size);
-            return new(section, _unknown);
+            byte[] unknown = _reader.Read(section.Size);
+            return new(section, unknown);
         }
         public Txt2 ReadTxt2()
         {
             SectionHeader section = ReadSectionHeader();
-            uint string_count = header.converter.Convert(reader.ReadU32());
+            uint stringCount = Header.Converter.Convert(_reader.ReadU32());
             List<uint> offsets = new();
             List<string> strings = new();
-            foreach (var _ in Enumerable.Range(0, (int)string_count)) {
-                offsets.Add(header.converter.Convert(reader.ReadU32()));
+            foreach (var _ in Enumerable.Range(0, (int)stringCount)) {
+                offsets.Add(Header.Converter.Convert(_reader.ReadU32()));
             }
-            foreach (var i in Enumerable.Range(0, (int)string_count)) {
-                uint str_end = i == string_count - 1 ? section.size : offsets[i + 1];
-                strings.Add(Util.RawToString(reader.Read(str_end - offsets[i]).ToList(), header.encoding, header.converter));
+            foreach (var i in Enumerable.Range(0, (int)stringCount)) {
+                uint strEnd = i == stringCount - 1 ? section.Size : offsets[i + 1];
+                strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]).ToList(), Header.Encoding, Header.Converter));
             }
-            return new Txt2(header, section, strings);
+            return new Txt2(Header, section, strings);
         }
-        public Group ReadGroup()
+
+        private Group ReadGroup()
         {
-            uint label_count = header.converter.Convert(reader.ReadU32());
-            uint offset = header.converter.Convert(reader.ReadU32());
-            return new(label_count, offset);
+            uint labelCount = Header.Converter.Convert(_reader.ReadU32());
+            uint offset = Header.Converter.Convert(_reader.ReadU32());
+            return new(labelCount, offset);
         }
-        public SectionHeader ReadSectionHeader()
+
+        private SectionHeader ReadSectionHeader()
         {
-            byte[] magic = reader.Read(4);
-            uint size = header.converter.Convert(reader.ReadU32());
-            byte[] padding = reader.Read(8);
+            byte[] magic = _reader.Read(4);
+            uint size = Header.Converter.Convert(_reader.ReadU32());
+            byte[] padding = _reader.Read(8);
             return new(magic, size, padding);
         }
         public bool SkipPadding()
         {
-            for (var i = 0; i < (int)MSBT.PADDING_LENGTH; i++) {
-                if (reader.HasReachedEOF()) {
+            for (var i = 0; i < (int)Msbt.PaddingLength; i++) {
+                if (_reader.HasReachedEof()) {
                     return true;
                 }
-                else if (reader.ReadByte() != MSBT.PADDING_CHAR) {
-                    reader.Seek(-1);
+                else if (_reader.ReadByte() != Msbt.PaddingChar) {
+                    _reader.Seek(-1);
                     return true;
                 }
             }
             return false;
         }
-        public bool HasReachedEOF()
+        public bool HasReachedEof()
         {
-            return reader.HasReachedEOF();
+            return _reader.HasReachedEof();
         }
         public byte[] Peek(int count)
         {
-            return reader.Peek(count);
+            return _reader.Peek(count);
         }
     }
-    internal class ReadCounter
+    internal class ReadCounter(BinaryReader reader)
     {
-        ulong read;
-        ulong length;
-        BinaryReader reader;
-        public ReadCounter(BinaryReader reader)
-        {
-            this.reader = reader;
-            read = 0ul;
-            length = (ulong)reader.BaseStream.Length;
-        }
+        private ulong _read;
+        private readonly ulong _length = (ulong)reader.BaseStream.Length;
+
         public byte[] Peek(int count)
         {
             byte[] ret = reader.ReadBytes(count);
@@ -181,52 +175,52 @@ namespace MsbtLib
         }
         public byte[] Read(ulong count)
         {
-            if (read + count > length) {
+            if (_read + count > _length) {
                 throw new EndOfStreamException();
             }
-            read += count;
+            _read += count;
             return reader.ReadBytes((int)count);
         }
         public byte ReadByte()
         {
-            if (read + 1ul > length) {
+            if (_read + 1ul > _length) {
                 throw new EndOfStreamException();
             }
-            read += 1ul;
+            _read += 1ul;
             return reader.ReadByte();
         }
         public ushort ReadU16()
         {
-            if (read + 2ul > length) {
+            if (_read + 2ul > _length) {
                 throw new EndOfStreamException();
             }
-            read += 2ul;
+            _read += 2ul;
             return reader.ReadUInt16();
         }
         public uint ReadU32()
         {
-            if (read + 4ul > length) {
+            if (_read + 4ul > _length) {
                 throw new EndOfStreamException();
             }
-            read += 4ul;
+            _read += 4ul;
             return reader.ReadUInt32();
         }
         public ulong ReadU64()
         {
-            if (read + 8ul > length) {
+            if (_read + 8ul > _length) {
                 throw new EndOfStreamException();
             }
-            read += 8ul;
+            _read += 8ul;
             return reader.ReadUInt64();
         }
         public void Seek(int count)
         {
-            read += (ulong)count;
+            _read += (ulong)count;
             reader.BaseStream.Seek(count, SeekOrigin.Current);
         }
-        public bool HasReachedEOF()
+        public bool HasReachedEof()
         {
-            return read >= length;
+            return _read >= _length;
         }
     }
 }

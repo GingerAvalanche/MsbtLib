@@ -19,268 +19,256 @@ namespace MsbtLib
         Little
     }
 
-    public enum UTFEncoding
+    public enum UtfEncoding
     {
-        UTF8,
-        UTF16
+        Utf8,
+        Utf16
     }
 
-    public class MsbtEntry
+    public class MsbtEntry(string attribute, string value)
     {
-        public string Attribute;
-        public string Value;
-
-        public MsbtEntry(string attribute, string value)
-        {
-            Attribute = attribute;
-            Value = value;
-        }
+        public string? Attribute { get; set; } = attribute is "" ? null : attribute;
+        public string? Value { get; set; } = value is "" ? null : value;
     }
 
-    public class MSBT : ICalculatesSize, IUpdates
+    public class Msbt : ICalculatesSize, IUpdates
     {
-        public static readonly string HEADER_MAGIC = "MsgStdBn";
-        public const byte PADDING_CHAR = 0xAB;
-        public const ulong PADDING_LENGTH = 16;
-        public Header header;
-        public List<SectionTag> section_order;
-        internal Ato1? ato1;
-        internal Atr1? atr1;
-        internal Lbl1? lbl1;
-        internal Nli1? nli1;
-        internal Tsy1? tsy1;
-        internal Txt2? txt2;
+        public const string HeaderMagic = "MsgStdBn";
+        public const byte PaddingChar = 0xAB;
+        public const ulong PaddingLength = 16;
+        public Header Header;
+        public List<SectionTag> SectionOrder;
+        internal Ato1? Ato1;
+        internal Atr1? Atr1;
+        internal Lbl1? Lbl1;
+        internal Nli1? Nli1;
+        internal Tsy1? Tsy1;
+        internal Txt2? Txt2;
 
-        public MSBT(Endianness endianness, UTFEncoding encoding)
+        public Msbt(Endianness endianness, UtfEncoding encoding)
         {
-            header = new(Encoding.ASCII.GetBytes(HEADER_MAGIC), new(endianness), 0, encoding, 3, 0, 0, 0x20, new byte[10]);
-            section_order = new List<SectionTag>();
+            Header = new(Encoding.ASCII.GetBytes(HeaderMagic), new(endianness), 0, encoding, 3, 0, 0, 0x20, new byte[10]);
+            SectionOrder = new List<SectionTag>();
         }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public MSBT(byte[] data)
+        public Msbt(byte[] data)
         {
             using MemoryStream stream = new(data);
             Load(stream);
         }
-        public MSBT(Stream stream)
+        public Msbt(Stream stream)
         {
             Load(stream);
         }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        protected void Load(Stream stream)
+        private void Load(Stream stream)
         {
-            using BinaryReader b_reader = new(stream);
-            MsbtReader reader = new(b_reader);
-            header = reader.Header;
-            section_order = new();
+            using BinaryReader bReader = new(stream);
+            MsbtReader reader = new(bReader);
+            Header = reader.Header;
+            SectionOrder = new();
             while (true)
             {
-                if (reader.HasReachedEOF())
+                if (reader.HasReachedEof())
                 {
                     break;
                 }
                 switch (Encoding.UTF8.GetString(reader.Peek(4)))
                 {
                     case "ATO1":
-                        ato1 = reader.ReadAto1();
-                        section_order.Add(SectionTag.Ato1);
+                        Ato1 = reader.ReadAto1();
+                        SectionOrder.Add(SectionTag.Ato1);
                         break;
                     case "ATR1":
-                        atr1 = reader.ReadAtr1();
-                        section_order.Add(SectionTag.Atr1);
+                        Atr1 = reader.ReadAtr1();
+                        SectionOrder.Add(SectionTag.Atr1);
                         break;
                     case "LBL1":
-                        lbl1 = reader.ReadLbl1(this);
-                        section_order.Add(SectionTag.Lbl1);
+                        Lbl1 = reader.ReadLbl1(this);
+                        SectionOrder.Add(SectionTag.Lbl1);
                         break;
                     case "NLI1":
-                        nli1 = reader.ReadNli1();
-                        section_order.Add(SectionTag.Nli1);
+                        Nli1 = reader.ReadNli1();
+                        SectionOrder.Add(SectionTag.Nli1);
                         break;
                     case "TSY1":
-                        tsy1 = reader.ReadTsy1();
-                        section_order.Add(SectionTag.Tsy1);
+                        Tsy1 = reader.ReadTsy1();
+                        SectionOrder.Add(SectionTag.Tsy1);
                         break;
                     case "TXT2":
-                        txt2 = reader.ReadTxt2();
-                        section_order.Add(SectionTag.Txt2);
+                        Txt2 = reader.ReadTxt2();
+                        SectionOrder.Add(SectionTag.Txt2);
                         break;
                 }
                 reader.SkipPadding();
             }
         }
 
-        public void Write(string file_name)
+        public void Write(string fileName)
         {
             Update();
-            using FileStream f_stream = new(file_name, FileMode.Create, FileAccess.Write);
-            using BinaryWriter b_writer = new(f_stream);
-            MsbtWriter writer = new(this, b_writer);
+            using FileStream fStream = new(fileName, FileMode.Create, FileAccess.Write);
+            using BinaryWriter bWriter = new(fStream);
+            MsbtWriter writer = new(this, bWriter);
             writer.WriteHeader();
-#pragma warning disable CS8604 // Possible null reference argument.
-            foreach (SectionTag tag in section_order) {
+            foreach (SectionTag tag in SectionOrder) {
                 switch (tag) {
                     case SectionTag.Ato1:
-                        writer.WriteAto1(ato1);
+                        writer.WriteAto1(Ato1!);
                         break;
                     case SectionTag.Atr1:
-                        writer.WriteAtr1(atr1);
+                        writer.WriteAtr1(Atr1!);
                         break;
                     case SectionTag.Lbl1:
-                        writer.WriteLbl1(lbl1);
+                        writer.WriteLbl1(Lbl1!);
                         break;
                     case SectionTag.Nli1:
-                        writer.WriteNli1(nli1);
+                        writer.WriteNli1(Nli1!);
                         break;
                     case SectionTag.Tsy1:
-                        writer.WriteTsy1(tsy1);
+                        writer.WriteTsy1(Tsy1!);
                         break;
                     case SectionTag.Txt2:
-                        writer.WriteTxt2(txt2);
+                        writer.WriteTxt2(Txt2!);
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
-#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         public byte[] Write()
         {
             Update();
-            using MemoryStream m_stream = new((int)header.file_size);
-            using BinaryWriter b_writer = new(m_stream);
-            MsbtWriter writer = new(this, b_writer);
+            using MemoryStream mStream = new((int)Header.FileSize);
+            using BinaryWriter bWriter = new(mStream);
+            MsbtWriter writer = new(this, bWriter);
             writer.WriteHeader();
 #pragma warning disable CS8604 // Possible null reference argument.
-            foreach (SectionTag tag in section_order)
+            foreach (SectionTag tag in SectionOrder)
             {
                 switch (tag)
                 {
                     case SectionTag.Ato1:
-                        writer.WriteAto1(ato1);
+                        writer.WriteAto1(Ato1);
                         break;
                     case SectionTag.Atr1:
-                        writer.WriteAtr1(atr1);
+                        writer.WriteAtr1(Atr1);
                         break;
                     case SectionTag.Lbl1:
-                        writer.WriteLbl1(lbl1);
+                        writer.WriteLbl1(Lbl1);
                         break;
                     case SectionTag.Nli1:
-                        writer.WriteNli1(nli1);
+                        writer.WriteNli1(Nli1);
                         break;
                     case SectionTag.Tsy1:
-                        writer.WriteTsy1(tsy1);
+                        writer.WriteTsy1(Tsy1);
                         break;
                     case SectionTag.Txt2:
-                        writer.WriteTxt2(txt2);
+                        writer.WriteTxt2(Txt2);
                         break;
                 }
             }
 #pragma warning restore CS8604 // Possible null reference argument.
-            return ((MemoryStream)writer.writer.writer.BaseStream).ToArray();
+            return ((MemoryStream)writer.Writer.Writer.BaseStream).ToArray();
         }
 
         public void CreateAto1()
         {
-            if (ato1 != null)
+            if (Ato1 != null)
             {
                 return;
             }
-            ato1 = new(new(Encoding.ASCII.GetBytes("ATO1"), 0), Array.Empty<byte>());
-            section_order.Add(SectionTag.Ato1);
-            header.section_count += 1;
+            Ato1 = new(new("ATO1"u8.ToArray(), 0), []);
+            SectionOrder.Add(SectionTag.Ato1);
+            Header.SectionCount += 1;
         }
         public void CreateAtr1()
         {
-            if (atr1 != null)
+            if (Atr1 != null)
             {
                 return;
             }
-            atr1 = new(header, new(Encoding.ASCII.GetBytes("ATR1"), 8), 0, 0, new());
-            section_order.Add(SectionTag.Atr1);
-            header.section_count += 1;
+            Atr1 = new(Header, new("ATR1"u8.ToArray(), 8), 0, 0, new());
+            SectionOrder.Add(SectionTag.Atr1);
+            Header.SectionCount += 1;
         }
         public void CreateLbl1()
         {
-            if (lbl1 != null)
+            if (Lbl1 != null)
             {
                 return;
             }
-            lbl1 = new(this, new(Encoding.ASCII.GetBytes("LBL1"), 12));
-            section_order.Add(SectionTag.Lbl1);
-            header.section_count += 1;
+            Lbl1 = new(this, new(Encoding.ASCII.GetBytes("LBL1"), 12));
+            SectionOrder.Add(SectionTag.Lbl1);
+            Header.SectionCount += 1;
         }
         public void CreateTxt2()
         {
-            if (txt2 != null)
+            if (Txt2 != null)
             {
                 return;
             }
-            txt2 = new(header, new(Encoding.ASCII.GetBytes("TXT2"), 8), new());
-            section_order.Add(SectionTag.Txt2);
-            header.section_count += 1;
-            if (lbl1 != null)
+            Txt2 = new(Header, new(Encoding.ASCII.GetBytes("TXT2"), 8), new());
+            SectionOrder.Add(SectionTag.Txt2);
+            Header.SectionCount += 1;
+            if (Lbl1 != null)
             {
-                txt2.SetStrings(lbl1.Labels.Select(l => ""));
+                Txt2.SetStrings(Lbl1.Labels.Select(_ => ""));
             }
         }
 
         public Dictionary<string, MsbtEntry> GetTexts()
         {
-            if (lbl1 == null || txt2 == null)
+            if (Lbl1 == null || Txt2 == null)
             {
                 throw new Exception("This MSBT does not contain texts.");
             }
             Dictionary<string, MsbtEntry> texts = new();
-            foreach (Label label in lbl1.Labels) {
-                string atr = atr1?.Strings[(int)label.Index] ?? string.Empty;
-                texts.Add(label.Name, new(atr, txt2.Strings[(int)label.Index]));
+            foreach (Label label in Lbl1.Labels) {
+                string atr = Atr1?.Strings[(int)label.Index] ?? string.Empty;
+                texts.Add(label.Name, new(atr, Txt2.Strings[(int)label.Index]));
             }
             return texts;
         }
 
         public void SetTexts(Dictionary<string, MsbtEntry> texts)
         {
-            if (lbl1 == null || txt2 == null)
+            if (Lbl1 == null || Txt2 == null)
             {
                 throw new Exception(@"This MSBT does not support texts. Use CreateLbl1() and/or 
                     CreateTxt2() to make it support texts.");
             }
-            if (texts.Values.Any(e => !string.IsNullOrEmpty(e.Attribute)) && atr1 == null)
+            if (texts.Values.Any(e => !string.IsNullOrEmpty(e.Attribute)) && Atr1 == null)
             {
                 throw new Exception(@"This MSBT has no attribute section but was given an attribute. 
                     Use CreateAtr1() to give it an attribute section if you want it to have one.");
             }
-            List<string> new_keys = texts.Keys.Except(lbl1.Labels.Select(l => l.Name)).ToList();
-            foreach (string old_key in texts.Keys.Except(new_keys))
+            List<string> newKeys = texts.Keys.Except(Lbl1.Labels.Select(l => l.Name)).ToList();
+            foreach (string oldKey in texts.Keys.Except(newKeys))
             {
-                Label label = lbl1.Labels.First(l => l.Name == old_key);
-                if (atr1 != null)
+                Label label = Lbl1.Labels.First(l => l.Name == oldKey);
+                if (Atr1 != null)
                 {
-                    label.Attribute = texts[old_key].Attribute;
+                    label.Attribute = texts[oldKey].Attribute ?? string.Empty;
                 }
-                label.Value = texts[old_key].Value;
+                label.Value = texts[oldKey].Value ?? string.Empty;
             }
-            foreach (string new_key in new_keys)
+            foreach (string newKey in newKeys)
             {
-                uint index = 0;
-                if (atr1 != null)
-                {
-                    atr1.AddString(texts[new_key].Attribute);
-                }
-                index = txt2.AddString(texts[new_key].Value);
-                lbl1.Labels.Add(new(lbl1, new_key, index));
+                Atr1?.AddString(texts[newKey].Attribute ?? string.Empty);
+                var index = Txt2.AddString(texts[newKey].Value ?? string.Empty);
+                Lbl1.Labels.Add(new(Lbl1, newKey, index));
             }
-            lbl1.Update();
-            if (atr1 != null)
-            {
-                atr1.Update();
-            }
-            txt2.Update();
+            Lbl1.Update();
+            Atr1?.Update();
+            Txt2.Update();
         }
 
-        public void SetEncoding(UTFEncoding encoding) => header.encoding = encoding;
-        public void SetEndianness(Endianness endianness) => header.converter.SetEndianness(endianness);
-        public static ulong PlusPadding(ulong size)
+        public void SetEncoding(UtfEncoding encoding) => Header.Encoding = encoding;
+        public void SetEndianness(Endianness endianness) => Header.Converter.Endianness = endianness;
+
+        private static ulong PlusPadding(ulong size)
         {
             ulong rem = size % 16ul;
             if (rem > 0) {
@@ -291,19 +279,19 @@ namespace MsbtLib
 
         public void Update()
         {
-            header.file_size = (uint)CalcSize();
-            header.section_count = (ushort)section_order.Count;
+            Header.FileSize = (uint)CalcSize();
+            Header.SectionCount = (ushort)SectionOrder.Count;
         }
 
         public ulong CalcSize()
         {
-            return header.CalcSize()
-                + (lbl1 != null ? PlusPadding(lbl1.CalcSize()) : 0)
-                + (nli1 != null ? PlusPadding(nli1.CalcSize()) : 0)
-                + (ato1 != null ? PlusPadding(ato1.CalcSize()) : 0)
-                + (atr1 != null ? PlusPadding(atr1.CalcSize()) : 0)
-                + (tsy1 != null ? PlusPadding(tsy1.CalcSize()) : 0)
-                + (txt2 != null ? PlusPadding(txt2.CalcSize()) : 0);
+            return Header.CalcSize()
+                + (Lbl1 != null ? PlusPadding(Lbl1.CalcSize()) : 0)
+                + (Nli1 != null ? PlusPadding(Nli1.CalcSize()) : 0)
+                + (Ato1 != null ? PlusPadding(Ato1.CalcSize()) : 0)
+                + (Atr1 != null ? PlusPadding(Atr1.CalcSize()) : 0)
+                + (Tsy1 != null ? PlusPadding(Tsy1.CalcSize()) : 0)
+                + (Txt2 != null ? PlusPadding(Txt2.CalcSize()) : 0);
         }
     }
 }

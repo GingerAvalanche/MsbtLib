@@ -2,17 +2,10 @@
 
 namespace MsbtLib
 {
-    public class EndiannessConverter
+    public class EndiannessConverter(Endianness endianness)
     {
-        private Endianness endianness;
-        public EndiannessConverter(Endianness endianness)
-        {
-            this.endianness = endianness;
-        }
-        public void SetEndianness(Endianness endianness)
-        {
-            this.endianness = endianness;
-        }
+        public Endianness Endianness { get; set; } = endianness;
+
         public byte[] GetBytes(ushort input)
         {
             return BitConverter.GetBytes(Convert(input));
@@ -27,7 +20,7 @@ namespace MsbtLib
         }
         public byte[] GetBytes(string input)
         {
-            return endianness switch
+            return Endianness switch
             {
                 Endianness.Big => Encoding.BigEndianUnicode.GetBytes(input),
                 _ => Encoding.Unicode.GetBytes(input),
@@ -35,7 +28,7 @@ namespace MsbtLib
         }
         public ushort Convert(ushort input)
         {
-            return endianness switch
+            return Endianness switch
             {
                 Endianness.Big => Util.ReverseBytes(input),
                 _ => input,
@@ -43,7 +36,7 @@ namespace MsbtLib
         }
         public uint Convert(uint input)
         {
-            return endianness switch
+            return Endianness switch
             {
                 Endianness.Big => Util.ReverseBytes(input),
                 _ => input,
@@ -51,17 +44,17 @@ namespace MsbtLib
         }
         public ulong Convert(ulong input)
         {
-            return endianness switch
+            return Endianness switch
             {
                 Endianness.Big => Util.ReverseBytes(input),
                 _ => input,
             };
         }
-        static public List<byte> ConvertLabelToRaw(List<char> input)
+        public static List<byte> ConvertLabelToRaw(List<char> input)
         {
             return Encoding.ASCII.GetBytes(input.ToArray()).ToList();
         }
-        static public List<char> ConvertRawToLabel(List<byte> input)
+        public static List<char> ConvertRawToLabel(List<byte> input)
         {
             return Encoding.ASCII.GetString(input.ToArray()).ToList();
         }

@@ -1,8 +1,6 @@
-﻿using System.Text;
-
-namespace MsbtLib
+﻿namespace MsbtLib
 {
-    static internal class Extensions
+    internal static class Extensions
     {
         private static IEnumerable<IEnumerable<T>> ChunkCore<T>(this IEnumerable<T> enumerable, int batchSize)
         {
@@ -25,8 +23,8 @@ namespace MsbtLib
 
         public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> enumerable, int batchSize)
         {
-            if (enumerable == null) throw new ArgumentNullException(nameof(enumerable));
-            if (batchSize <= 0) throw new ArgumentOutOfRangeException(nameof(batchSize));
+            ArgumentNullException.ThrowIfNull(enumerable);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
             return enumerable.ChunkCore(batchSize);
         }
 
@@ -38,21 +36,17 @@ namespace MsbtLib
             }
             return array;
         }
-        public static ushort DequeueUInt16(this Queue<byte> queue)
+        public static void Merge<T>(this T[] arr, IEnumerable<T> other, int startIndex)
         {
-            byte[] bytes = new byte[] { queue.Dequeue(), queue.Dequeue() };
-            return BitConverter.ToUInt16(bytes);
-        }
-        public static void Merge<T>(this T[] arr, IEnumerable<T> other, int start_index)
-        {
-            if (arr.Length < (start_index + other.Count()))
+            T[] enumerable = other as T[] ?? other.ToArray();
+            if (arr.Length < startIndex + enumerable.Length)
             {
-                Array.Resize(ref arr, start_index + other.Count());
+                Array.Resize(ref arr, startIndex + enumerable.Length);
             }
             int i = 0;
-            foreach (T obj in other)
+            foreach (T obj in enumerable)
             {
-                arr[start_index + i] = obj;
+                arr[startIndex + i] = obj;
                 i++;
             }
         }

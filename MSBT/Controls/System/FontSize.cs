@@ -1,19 +1,18 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls
+namespace MsbtLib.Controls.System
 {
-    internal class TextSize : Control
+    internal class FontSize : Control
     {
-        public const ushort tag_group = 0x0000;
-        public const ushort tag_type = 0x0002;
-        private ushort param_size;
-        private ushort Size;
-        public TextSize(List<ushort> parameters)
+        public const ushort TagType = 0x0002;
+        private const ushort ParamSize = 2;
+        private readonly ushort _size;
+        public FontSize(ref VariableByteQueue queue)
         {
-            param_size = parameters[0];
-            Size = parameters[1];
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("FontSize parameter size mismatch");
+            _size = queue.DequeueU16();
         }
-        public TextSize(string str)
+        public FontSize(string str)
         {
             Regex pattern = new(@"<textsize\spercent=(-?\d+)\s/>");
             Match m = pattern.Match(str);
@@ -26,22 +25,21 @@ namespace MsbtLib.Controls
             {
                 throw new ArgumentException($"Textsize percent is invalid. Must be a number between 0 and 65535, was: {temp}");
             }
-            Size = (ushort)temp;
-            param_size = 2;
+            _size = (ushort)temp;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {
-            byte[] bytes = new byte[param_size + 8];
-            bytes.Merge(converter.GetBytes(control_tag), 0);
-            bytes.Merge(converter.GetBytes(tag_group), 2);
-            bytes.Merge(converter.GetBytes(tag_type), 4);
-            bytes.Merge(converter.GetBytes(param_size), 6);
-            bytes.Merge(converter.GetBytes(Size), 8);
+            byte[] bytes = new byte[ParamSize + 8];
+            bytes.Merge(converter.GetBytes(ControlTag), 0);
+            bytes.Merge(converter.GetBytes(SystemTag.Group), 2);
+            bytes.Merge(converter.GetBytes(TagType), 4);
+            bytes.Merge(converter.GetBytes(ParamSize), 6);
+            bytes.Merge(converter.GetBytes(_size), 8);
             return bytes;
         }
         public override string ToControlString()
         {
-            return $"<textsize percent={Size} />";
+            return $"<textsize percent={_size} />";
         }
     }
 }
