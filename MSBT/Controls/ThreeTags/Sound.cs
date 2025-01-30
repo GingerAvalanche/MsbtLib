@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.Three
+namespace MsbtLib.Controls.ThreeTags
 {
     internal class Sound : Control
     {

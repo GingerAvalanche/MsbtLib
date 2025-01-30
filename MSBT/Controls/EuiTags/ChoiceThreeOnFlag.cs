@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.EUI;
+namespace MsbtLib.Controls.EuiTags;
 
 internal class ChoiceThreeOnFlag : Control
 {

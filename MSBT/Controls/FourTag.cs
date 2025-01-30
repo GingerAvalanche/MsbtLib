@@ -1,4 +1,4 @@
-using MsbtLib.Controls.Four;
+using MsbtLib.Controls.FourTags;
 
 namespace MsbtLib.Controls;
 

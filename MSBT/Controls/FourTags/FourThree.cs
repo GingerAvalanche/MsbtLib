@@ -1,4 +1,4 @@
-namespace MsbtLib.Controls.Four;
+namespace MsbtLib.Controls.FourTags;
 
 internal class FourThree : Control
 {

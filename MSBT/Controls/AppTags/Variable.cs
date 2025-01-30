@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.App
+namespace MsbtLib.Controls.AppTags
 {
     internal class Variable : Control
     {

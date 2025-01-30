@@ -1,12 +1,12 @@
 ﻿using MsbtLib.Controls;
 using System.Text.RegularExpressions;
-using MsbtLib.Controls.App;
-using MsbtLib.Controls.EUI;
-using MsbtLib.Controls.Five;
-using MsbtLib.Controls.Four;
-using MsbtLib.Controls.Grammar;
-using MsbtLib.Controls.System;
-using MsbtLib.Controls.Three;
+using MsbtLib.Controls.AppTags;
+using MsbtLib.Controls.EuiTags;
+using MsbtLib.Controls.FiveTags;
+using MsbtLib.Controls.FourTags;
+using MsbtLib.Controls.GrammarTags;
+using MsbtLib.Controls.SystemTags;
+using MsbtLib.Controls.ThreeTags;
 
 namespace MsbtLib
 {

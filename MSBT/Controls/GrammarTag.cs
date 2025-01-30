@@ -1,4 +1,4 @@
-using MsbtLib.Controls.Grammar;
+using MsbtLib.Controls.GrammarTags;
 
 namespace MsbtLib.Controls;
 

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.Grammar;
+namespace MsbtLib.Controls.GrammarTags;
 
 internal class Info : Control
 {

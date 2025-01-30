@@ -1,4 +1,4 @@
-using MsbtLib.Controls.Five;
+using MsbtLib.Controls.FiveTags;
 
 namespace MsbtLib.Controls;
 

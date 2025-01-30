@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.Four
+namespace MsbtLib.Controls.FourTags
 {
     internal class Animation : Control
     {

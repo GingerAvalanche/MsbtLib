@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.Five
+namespace MsbtLib.Controls.FiveTags
 {
     enum PauseTime
     {

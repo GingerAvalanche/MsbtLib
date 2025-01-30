@@ -1,11 +1,14 @@
-namespace MsbtLib.Controls.System;
+namespace MsbtLib.Controls.SystemTags;
 
 internal class PageBreak : Control
 {
     public const string Tag = "br";
     public const ushort TagType = 0x0004;
 
-    public PageBreak(ref VariableByteQueue queue) { }
+    public PageBreak(ref VariableByteQueue queue)
+    {
+        System.Diagnostics.Debug.WriteLine("Found PageBreak");
+    }
 
     public PageBreak(string str)
     {

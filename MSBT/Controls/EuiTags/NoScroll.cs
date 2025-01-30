@@ -1,4 +1,4 @@
-namespace MsbtLib.Controls.EUI;
+namespace MsbtLib.Controls.EuiTags;
 
 internal class NoScroll : Control
 {

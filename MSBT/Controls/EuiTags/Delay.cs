@@ -1,27 +1,28 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.EUI
+namespace MsbtLib.Controls.EuiTags
 {
-    internal class AutoAdvance : Control
+    internal class Delay : Control
     {
-        public const string Tag = nameof(AutoAdvance);
-        public const ushort TagType = 0x0003;
+        public const string Tag = nameof(Delay);
+        public const ushort TagType = 0x0000;
         private const ushort ParamSize = 4;
         private readonly uint _frames;
-        public AutoAdvance(ref VariableByteQueue queue)
+        public Delay(ref VariableByteQueue queue)
         {
-            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Auto advance parameter size mismatch");
+            if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Delay parameter size mismatch");
             _frames = queue.DequeueU32();
         }
-        public AutoAdvance(string str)
+        public Delay(string str)
         {
             Regex pattern = new($@"<{Tag}=(\d+)\s/>");
             Match m = pattern.Match(str);
-            if (!m.Success || uint.Parse(m.Groups[1].ToString()) > 65535)
+            bool success = uint.TryParse(m.Groups[1].ToString(), out uint temp);
+            if (!success || temp > 65535)
             {
                 throw new Exception($"Proper usage: <{Tag}=# /> where # is a number of frames between 0 and 65535. Valid examples: <{Tag}=30 /> or <{Tag}=60 />");
             }
-            _frames = uint.Parse(m.Groups[1].ToString());
+            _frames = temp;
         }
         public override byte[] ToControlSequence(EndiannessConverter converter)
         {

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.System;
+namespace MsbtLib.Controls.SystemTags;
 
 internal class Ruby : Control
 {

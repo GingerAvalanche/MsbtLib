@@ -1,4 +1,4 @@
-using MsbtLib.Controls.EUI;
+using MsbtLib.Controls.EuiTags;
 
 namespace MsbtLib.Controls;
 

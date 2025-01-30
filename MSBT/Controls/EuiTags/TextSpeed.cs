@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace MsbtLib.Controls.EUI;
+namespace MsbtLib.Controls.EuiTags;
 
 internal class TextSpeed : Control
 {
