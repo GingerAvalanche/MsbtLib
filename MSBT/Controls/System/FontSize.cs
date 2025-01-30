@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.System
 {
     internal class FontSize : Control
     {
+        public const string Tag = nameof(FontSize);
         public const ushort TagType = 0x0002;
         private const ushort ParamSize = 2;
         private readonly ushort _size;
@@ -14,16 +15,16 @@ namespace MsbtLib.Controls.System
         }
         public FontSize(string str)
         {
-            Regex pattern = new(@"<textsize\spercent=(-?\d+)\s/>");
+            Regex pattern = new($@"<{Tag}\spercent=(-?\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException("Proper usage: <textsize percent=# /> where # is a 16-bit integer. Valid examples: <textsize percent=125 /> or <textsize percent=100 />");
+                throw new ArgumentException($"Proper usage: <{Tag} percent=# /> where # is a 16-bit integer. Valid examples: <{Tag} percent=125 /> or <{Tag} percent=100 />");
             }
             int temp = int.Parse(m.Groups[1].ToString());
             if (temp < 0 || temp > 65535)
             {
-                throw new ArgumentException($"Textsize percent is invalid. Must be a number between 0 and 65535, was: {temp}");
+                throw new ArgumentException($"{Tag} percent is invalid. Must be a number between 0 and 65535, was: {temp}");
             }
             _size = (ushort)temp;
         }

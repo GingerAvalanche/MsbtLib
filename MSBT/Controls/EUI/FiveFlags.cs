@@ -5,6 +5,7 @@ namespace MsbtLib.Controls.EUI;
 
 internal class FiveFlags : Control
 {
+    public const string Tag = nameof(FiveFlags);
     public const ushort TagType = 0x0009;
     private readonly ushort _paramSize;
     private readonly ushort _flagIdx0;
@@ -87,7 +88,7 @@ internal class FiveFlags : Control
 
     public FiveFlags(string str)
     {
-        Regex pattern = new(@"<fiveflags\sidx0=(\d)\sname0='(\w*)'\sval0=(-?\d+)\sidx1=(\d)\sname1='(\w*)'\sval1=(-?\d)\sidx2=(\d)\sname2='(\w*)'\sval2=(-?\d)\sidx3=(\d)\sname3='(\w*)'\sval3=(-?\d)\sidx4=(\d)\sname4='(\w*)'\sval4={}\sunk='(.*)'\s/>");
+        Regex pattern = new($@"<{Tag}\sidx0=(\d)\sname0='(\w*)'\sval0=(-?\d+)\sidx1=(\d)\sname1='(\w*)'\sval1=(-?\d)\sidx2=(\d)\sname2='(\w*)'\sval2=(-?\d)\sidx3=(\d)\sname3='(\w*)'\sval3=(-?\d)\sidx4=(\d)\sname4='(\w*)'\sval4={{}}\sunk='(.*)'\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
@@ -150,6 +151,6 @@ internal class FiveFlags : Control
 
     public override string ToControlString()
     {
-        return $"<fiveflags idx0={_flagIdx0} name0={_flagName0} val0={(short)_flagVal0} idx1={_flagIdx1} name1={_flagName1} val1={(short)_flagVal1} idx2={_flagIdx2} name2={_flagName2} val2={(short)_flagVal2} idx3={_flagIdx3} name3={_flagName3} val3={(short)_flagVal3} idx4={_flagIdx4} name4={_flagName4} val4={(short)_flagVal4} unk='{string.Join(' ', _unk)}' />";
+        return $"<{Tag} idx0={_flagIdx0} name0={_flagName0} val0={(short)_flagVal0} idx1={_flagIdx1} name1={_flagName1} val1={(short)_flagVal1} idx2={_flagIdx2} name2={_flagName2} val2={(short)_flagVal2} idx3={_flagIdx3} name3={_flagName3} val3={(short)_flagVal3} idx4={_flagIdx4} name4={_flagName4} val4={(short)_flagVal4} unk='{string.Join(' ', _unk)}' />";
     }
 }

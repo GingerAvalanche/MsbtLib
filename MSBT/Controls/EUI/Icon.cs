@@ -77,6 +77,7 @@ namespace MsbtLib.Controls.EUI
             IconType.X
         ];
 
+        public const string Tag = nameof(Icon);
         public const ushort TagType = 0x0007;
         private const ushort ParamSize = 2;
         private readonly byte _num;
@@ -88,11 +89,11 @@ namespace MsbtLib.Controls.EUI
         }
         public Icon(string str)
         {
-            Regex pattern = new(@"<icon=(\w+)(?:\((-?\d+)\))?\s/>");
+            Regex pattern = new($@"<{Tag}=(\w+)(?:\((-?\d+)\))?\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new Exception("Proper usage: <icon=?(#) /> where ? is an icon name and (#) is an optional key for that icon. Valid examples: <icon=DPadDown /> or <icon=X(38) />");
+                throw new Exception($"Proper usage: <{Tag}=?(#) /> where ? is an icon name and (#) is an optional key for that icon. Valid examples: <{Tag}=DPadDown /> or <{Tag}=X(38) />");
             }
             string parsedKey = m.Groups[1].ToString();
             IconType icon = (IconType)Enum.Parse(typeof(IconType), parsedKey);
@@ -141,7 +142,7 @@ namespace MsbtLib.Controls.EUI
             {
                 numStr = $"({_num})";
             }
-            return $"<icon={icon}{numStr} />";
+            return $"<{Tag}={icon}{numStr} />";
         }
     }
 }

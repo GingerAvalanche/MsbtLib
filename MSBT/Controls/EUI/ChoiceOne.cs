@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.EUI
 {
     internal class ChoiceOne : Control
     {
+        public const string Tag = "Choice1";
         public const ushort TagType = 0x000A;
         private const ushort ParamSize = 4;
         private readonly ushort _choice;
@@ -15,11 +16,11 @@ namespace MsbtLib.Controls.EUI
         }
         public ChoiceOne(string str)
         {
-            Regex pattern = new(@"<choice1=(\d+)\s/>");
+            Regex pattern = new($@"<{Tag}=(\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException(@"Proper usage: <choice1=# /> where # is a 16-bit integer. Valid examples: <choice1=10 /> or <choice1=7 />");
+                throw new ArgumentException($@"Proper usage: <{Tag}=# /> where # is a 16-bit integer. Valid examples: <{Tag}=10 /> or <{Tag}=7 />");
             }
             _choice = ushort.Parse(m.Groups[1].ToString());
         }
@@ -37,7 +38,7 @@ namespace MsbtLib.Controls.EUI
         }
         public override string ToControlString()
         {
-            return $"<choice1={_choice} />";
+            return $"<{Tag}={_choice} />";
         }
     }
 }

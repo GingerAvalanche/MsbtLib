@@ -5,11 +5,12 @@ namespace MsbtLib.Controls.Five
     enum PauseTime
     {
         Short,
-        Long,
-        Longer
+        Medium,
+        Long
     }
     internal class PauseLength : Control
     {
+        public const string Tag = nameof(PauseLength);
         private readonly PauseTime _time;
         public PauseLength(ref VariableByteQueue queue)
         {
@@ -18,11 +19,11 @@ namespace MsbtLib.Controls.Five
         }
         public PauseLength(string str)
         {
-            Regex pattern = new(@"<pauselength=(\w+)\s/>");
+            Regex pattern = new($@"<{Tag}=(\w+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success || !Enum.TryParse(typeof(PauseTime), m.Groups[1].ToString(), out object? time))
             {
-                throw new Exception("Proper usage: <pauselength=? /> where ? is a length: Short, Long, or Longer. Example: <pauselength=Long />");
+                throw new Exception($"Proper usage: <{Tag}=? /> where ? is a length: Short, Medium, or Long. Example: <{Tag}=Long />");
             }
             _time = (PauseTime)time;
         }
@@ -36,7 +37,7 @@ namespace MsbtLib.Controls.Five
         }
         public override string ToControlString()
         {
-            return $"<pauselength={_time} />";
+            return $"<{Tag}={_time} />";
         }
     }
 }

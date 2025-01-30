@@ -2,6 +2,7 @@ namespace MsbtLib.Controls.Four;
 
 internal class FourThree : Control
 {
+    public const string Tag = nameof(FourThree);
     public const ushort TagType = 0x0003;
     private const ushort ParamSize = 0;
 
@@ -23,6 +24,6 @@ internal class FourThree : Control
 
     public override string ToControlString()
     {
-        return "<fourthree />";
+        return $"<{Tag} />";
     }
 }

@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.EUI;
 
 internal class TextSpeed : Control
 {
+    public const string Tag = nameof(TextSpeed);
     public const ushort TagType = 0x0001;
     private const ushort ParamSize = 4;
     private readonly uint _speed;
@@ -14,12 +15,12 @@ internal class TextSpeed : Control
     }
     public TextSpeed(string str)
     {
-        Regex pattern = new(@"<textspeed=(\d+)\s/>");
+        Regex pattern = new($@"<{Tag}=(\d+)\s/>");
         Match m = pattern.Match(str);
         bool success = uint.TryParse(m.Groups[1].ToString(), out uint temp);
         if (!success || temp > 65535)
         {
-            throw new Exception("Proper usage: <textspeed=# /> where # is a number of frames between 0 and 65535. Valid examples: <delay=30 /> or <delay=60 />");
+            throw new Exception($"Proper usage: <{Tag}=# /> where # is a number of frames between 0 and 65535. Valid examples: <{Tag}=30 /> or <{Tag}=60 />");
         }
         _speed = temp;
     }
@@ -35,6 +36,6 @@ internal class TextSpeed : Control
     }
     public override string ToControlString()
     {
-        return $"<textspeed={_speed} />";
+        return $"<{Tag}={_speed} />";
     }
 }

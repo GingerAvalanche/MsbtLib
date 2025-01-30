@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.EUI
 {
     internal class ChoiceTwo : Control
     {
+        public const string Tag = "Choice2";
         public const ushort TagType = 0x0004;
         private const ushort ParamSize = 6;
         private readonly ushort _choice0;
@@ -20,14 +21,14 @@ namespace MsbtLib.Controls.EUI
         }
         public ChoiceTwo(string str)
         {
-            Regex pattern = new(@"<choice2\s0=(\d+)\s1=(\d+)\sdefault=(\d)\scancel=(\d)\s/>");
+            Regex pattern = new($@"<{Tag}\s0=(\d+)\s1=(\d+)\sdefault=(\d)\scancel=(\d)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException(@"Proper usage: <choice2 0=# 1=# cancel=# /> where all # are 16-bit 
+                throw new ArgumentException($@"Proper usage: <{Tag} 0=# 1=# cancel=# /> where all # are 16-bit 
                     integers, and cancel is the 0-based index of the choice that ends the dialogue. Valid examples: 
-                    <choice2 0=0 1=1 default=0 cancel=1 /> or 
-                    <choice2 0=16 1=17 default=1 cancel=1 />");
+                    <{Tag} 0=0 1=1 default=0 cancel=1 /> or 
+                    <{Tag} 0=16 1=17 default=1 cancel=1 />");
             }
             _choice0 = ushort.Parse(m.Groups[1].ToString());
             _choice1 = ushort.Parse(m.Groups[2].ToString());
@@ -49,7 +50,7 @@ namespace MsbtLib.Controls.EUI
         }
         public override string ToControlString()
         {
-            return $"<choice2 0={_choice0} 1={_choice1} default={_defaultIndex} cancel={_cancelIndex} />";
+            return $"<{Tag} 0={_choice0} 1={_choice1} default={_defaultIndex} cancel={_cancelIndex} />";
         }
     }
 }

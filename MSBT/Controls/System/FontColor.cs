@@ -15,6 +15,7 @@ namespace MsbtLib.Controls.System
     }
     internal class FontColor : Control
     {
+        public const string Tag = "Color";
         public const ushort TagType = 0x0003;
         private const ushort ParamSize = 2;
         private readonly Color _color;
@@ -25,16 +26,16 @@ namespace MsbtLib.Controls.System
         }
         public FontColor(string str)
         {
-            if (str == "</color>")
+            if (str == $"</{Tag}>")
             {
                 _color = Color.Reset;
             }
             else
             {
-                Match m = new Regex(@"<color=(.+)>").Match(str);
+                Match m = new Regex($@"<{Tag}=(.+)>").Match(str);
                 if (!m.Success)
                 {
-                    throw new Exception("Proper usage: <color=?> where ? is one of: Red, Green, Cyan, Grey, Azure, Orange, Gold.");
+                    throw new Exception($"Proper usage: <{Tag}=?> where ? is one of: Red, Green, Cyan, Grey, Azure, Orange, Gold.");
                 }
                 _color = (Color)Enum.Parse(typeof(Color), m.Groups[1].ToString());
             }
@@ -53,9 +54,9 @@ namespace MsbtLib.Controls.System
         {
             if (_color == Color.Reset)
             {
-                return "</color>";
+                return $"</{Tag}>";
             }
-            return $"<color={_color}>";
+            return $"<{Tag}={_color}>";
         }
     }
 }

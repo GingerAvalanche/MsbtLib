@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.System;
 
 internal class Ruby : Control
 {
+    public const string Tag = nameof(Ruby);
     public const ushort TagType = 0x0000;
     private readonly ushort _field0;
     private readonly ushort _field1;
@@ -18,11 +19,11 @@ internal class Ruby : Control
 
     public Ruby(string str)
     {
-        Regex pattern = new(@"<ruby\s0=(\d+)\s1=(\d+)\s2=(\d+)\s/>");
+        Regex pattern = new($@"<{Tag}\s0=(\d+)\s1=(\d+)\s2=(\d+)\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
-            throw new ArgumentException(@"Proper usage: <ruby 0=# 1=# 2=# where # are 16-bit integers. />");
+            throw new ArgumentException($"Proper usage: <{Tag} 0=# 1=# 2=# where # are 16-bit integers. />");
         }
         _field0 = ushort.Parse(m.Groups[1].ToString());
         _field1 = ushort.Parse(m.Groups[2].ToString());
@@ -41,6 +42,6 @@ internal class Ruby : Control
     }
     public override string ToControlString()
     {
-        return $"<ruby 0={_field0} 1={_field1} 2={_field2} />";
+        return $"<{Tag} 0={_field0} 1={_field1} 2={_field2} />";
     }
 }

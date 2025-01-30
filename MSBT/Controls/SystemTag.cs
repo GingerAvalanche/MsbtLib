@@ -15,7 +15,7 @@ internal static class SystemTag
             Font.TagType => new Font(ref queue),
             FontSize.TagType => new FontSize(ref queue),
             FontColor.TagType => new FontColor(ref queue),
-            PageBreak.TagType => new PageBreak(),
+            PageBreak.TagType => new PageBreak(ref queue),
             _ => throw new NotImplementedException($"00 {type} {string.Join(" ", queue.ToArray())}"),
         };
     }

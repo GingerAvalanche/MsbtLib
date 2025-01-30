@@ -10,6 +10,7 @@ namespace MsbtLib.Controls.System
     }
     internal class Font : Control
     {
+        public const string Tag = nameof(Font);
         public const ushort TagType = 0x0001;
         private const ushort ParamSize = 2;
         private readonly FontKind _face;
@@ -20,17 +21,17 @@ namespace MsbtLib.Controls.System
         }
         public Font(string str)
         {
-            if (str == "</font>")
+            if (str == $"</{Tag}>")
             {
                 _face = FontKind.Normal;
             }
             else
             {
-                Regex pattern = new(@"<font=(\w+)>");
+                Regex pattern = new($@"<{Tag}=(\w+)>");
                 Match m = pattern.Match(str);
                 if (!m.Success)
                 {
-                    throw new ArgumentException("The only recognized font in BOTW is Hylian: <font=Hylian>. Or reset to normal font with </font>");
+                    throw new ArgumentException($"The only recognized font in BOTW is Hylian: <{Tag}=Hylian>. Or reset to normal font with </{Tag}>");
                 }
                 _face = (FontKind)Enum.Parse(typeof(FontKind), m.Groups[1].ToString());
             }
@@ -49,9 +50,9 @@ namespace MsbtLib.Controls.System
         {
             if (_face == FontKind.Normal)
             {
-                return "</font>";
+                return $"</{Tag}>";
             }
-            return $"<font={_face}>";
+            return $"<{Tag}={_face}>";
         }
     }
 }

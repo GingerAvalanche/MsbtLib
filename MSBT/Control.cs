@@ -4,6 +4,7 @@ using MsbtLib.Controls.App;
 using MsbtLib.Controls.EUI;
 using MsbtLib.Controls.Five;
 using MsbtLib.Controls.Four;
+using MsbtLib.Controls.Grammar;
 using MsbtLib.Controls.System;
 using MsbtLib.Controls.Three;
 
@@ -43,26 +44,31 @@ namespace MsbtLib
             string type = m.Groups[1].ToString();
             return type switch
             {
-                "font" => new Font(s),
-                "textsize" => new FontSize(s),
-                "color" => new FontColor(s),
-                "pauseframes" => new Delay(s),
-                "auto_advance" => new AutoAdvance(s),
-                "choice2" => new ChoiceTwo(s),
-                "choice3" => new ChoiceThree(s),
-                "choice4" => new ChoiceFour(s),
-                "icon" => new Icon(s),
-                "choice3onflag" => new ChoiceThreeOnFlag(s),
-                "fiveflags" => new FiveFlags(s),
-                "choice1" => new ChoiceOne(s),
-                "variable" => new Variable(s),
-                "sound" => new Sound(s),
-                "fourzero" => new FourZero(s),
-                "sound2" => new Sound2(s),
-                "animation" => new Animation(s),
-                "fourthree" => new FourThree(s),
-                "pauselength" => new PauseLength(s),
-                "raw" => new RawControl(s),
+                Ruby.Tag => new Ruby(s),
+                Font.Tag => new Font(s),
+                FontSize.Tag => new FontSize(s),
+                FontColor.Tag => new FontColor(s),
+                PageBreak.Tag => new PageBreak(s),
+                Delay.Tag => new Delay(s),
+                TextSpeed.Tag => new TextSpeed(s),
+                NoScroll.Tag => new NoScroll(s),
+                AutoAdvance.Tag => new AutoAdvance(s),
+                ChoiceTwo.Tag => new ChoiceTwo(s),
+                ChoiceThree.Tag => new ChoiceThree(s),
+                ChoiceFour.Tag => new ChoiceFour(s),
+                Icon.Tag => new Icon(s),
+                ChoiceThreeOnFlag.Tag => new ChoiceThreeOnFlag(s),
+                FiveFlags.Tag => new FiveFlags(s),
+                ChoiceOne.Tag => new ChoiceOne(s),
+                Variable.Tag => new Variable(s),
+                Sound.Tag => new Sound(s),
+                FourZero.Tag => new FourZero(s),
+                Sound2.Tag => new Sound2(s),
+                Animation.Tag => new Animation(s),
+                FourThree.Tag => new FourThree(s),
+                PauseLength.Tag => new PauseLength(s),
+                Info.Tag => new Info(s),
+                RawControl.Tag => new RawControl(s),
                 _ => throw new ArgumentException($"Invalid control string: {s}")
             };
         }

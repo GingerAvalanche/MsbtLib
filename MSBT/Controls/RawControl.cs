@@ -4,6 +4,7 @@ namespace MsbtLib.Controls
 {
     internal class RawControl : Control
     {
+        public const string Tag = "Raw";
         private readonly ushort _tagGroup;
         private readonly ushort _tagType;
         private readonly ushort _paramSize;
@@ -22,25 +23,25 @@ namespace MsbtLib.Controls
         }
         public RawControl(string str)
         {
-            Regex pattern = new(@"<raw\sgroup=(\d+)\stype=(\d+)\sdata=""(.*)""\s/>");
+            Regex pattern = new(@$"<{Tag}\sgroup=(\d+)\stype=(\d+)\sdata='(.*)'\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException(@"Proper usage: <raw group=# type=# data=""?"" /> where # are 16-bit 
-                    integers and ? is 0 or more 8 bit integers. Valid examples: <raw group=1 type=8 data=""0 255 127"" /> 
-                    or <raw group=0 type=4 data="""" />");
+                throw new ArgumentException($@"Proper usage: <{Tag} group=# type=# data='?' /> where # are 16-bit 
+                    integers and ? is 0 or more 8 bit integers. Valid examples: <{Tag} group=1 type=8 data=""0 255 127"" /> 
+                    or <{Tag} group=0 type=4 data="""" />");
             }
             _tagGroup = ushort.Parse(m.Groups[1].ToString());
             _tagType = ushort.Parse(m.Groups[2].ToString());
             string tempStr = m.Groups[3].ToString();
             if (!string.IsNullOrEmpty(tempStr))
             {
-                List<int> temp = tempStr.Split(" ").Select(s => int.Parse(s)).ToList();
+                List<int> temp = tempStr.Split(" ").Select(int.Parse).ToList();
                 foreach (int i in temp)
                 {
                     if (i is < 0 or > 255)
                     {
-                        throw new ArgumentException($"raw data field is invalid. All numbers must be between 0 and 65535, one was: {i}");
+                        throw new ArgumentException($"{Tag} data field is invalid. All numbers must be between 0 and 65535, one was: {i}");
                     }
                 }
                 _field1 = temp.Select(i => (byte)i).ToArray();
@@ -63,7 +64,7 @@ namespace MsbtLib.Controls
         }
         public override string ToControlString()
         {
-            return $"<raw group={_tagGroup} type={_tagType} data=\"{string.Join(" ", _field1)}\" />";
+            return $"<{Tag} group={_tagGroup} type={_tagType} data='{string.Join(" ", _field1)}' />";
         }
     }
 }

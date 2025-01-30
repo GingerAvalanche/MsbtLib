@@ -1,7 +1,10 @@
+using System.Text.RegularExpressions;
+
 namespace MsbtLib.Controls.Grammar;
 
 internal class Info : Control
 {
+    public const string Tag = nameof(Info);
     public const ushort TagType = 0x0000;
     private const ushort ParamSize = 0x0004;
     private readonly byte _gender;
@@ -15,6 +18,20 @@ internal class Info : Control
         _definite = queue.DequeueU8();
         _indefinite = queue.DequeueU8();
         _plural = queue.DequeueU8();
+    }
+
+    public Info(string str)
+    {
+        Regex pattern = new($@"<{Tag}\sgender=(\d+)\sdefinite=(\d+)\sindefinite=(\d+)\splural=(\d+)\s/>");
+        Match m = pattern.Match(str);
+        if (!m.Success)
+        {
+            throw new ArgumentException($"Proper usage: <{Tag} gender=# definite=# indefinite=# plural=# /> where # are any 8-bit integers. Valid example: <{Tag} gender=2 definite=1 indefinite=1 plural=0 />");
+        }
+        _gender = byte.Parse(m.Groups[1].Value);
+        _definite = byte.Parse(m.Groups[2].Value);
+        _indefinite = byte.Parse(m.Groups[3].Value);
+        _plural = byte.Parse(m.Groups[4].Value);
     }
 
     public override byte[] ToControlSequence(EndiannessConverter converter)
@@ -34,6 +51,6 @@ internal class Info : Control
 
     public override string ToControlString()
     {
-        return $"<info gender={_gender} definite={_definite} indefinite={_indefinite} plural={_plural} />";
+        return $"<{Tag} gender={_gender} definite={_definite} indefinite={_indefinite} plural={_plural} />";
     }
 }

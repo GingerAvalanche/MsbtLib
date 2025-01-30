@@ -2,7 +2,18 @@ namespace MsbtLib.Controls.System;
 
 internal class PageBreak : Control
 {
+    public const string Tag = "br";
     public const ushort TagType = 0x0004;
+
+    public PageBreak(ref VariableByteQueue queue) { }
+
+    public PageBreak(string str)
+    {
+        if (str != $"<{Tag} />" && str != $"<{Tag}>")
+        {
+            throw new ArgumentException("Invalid PageBreak string");
+        }
+    }
 
     public override byte[] ToControlSequence(EndiannessConverter converter)
     {
@@ -14,6 +25,6 @@ internal class PageBreak : Control
     }
     public override string ToControlString()
     {
-        return $"<br />";
+        return $"<{Tag} />";
     }
 }

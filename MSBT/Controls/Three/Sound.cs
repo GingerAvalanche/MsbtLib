@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.Three
 {
     internal class Sound : Control
     {
+        public const string Tag = nameof(Sound);
         public const ushort TagType = 0x0001;
         private const ushort ParamSize = 2;
         private readonly byte _field1;
@@ -16,22 +17,22 @@ namespace MsbtLib.Controls.Three
         }
         public Sound(string str)
         {
-            Regex pattern = new(@"<sound\sfield_1=(-?\d+)\sfield_2=(-?\d+)\s/>");
+            Regex pattern = new(@$"<{Tag}\sfield_1=(-?\d+)\sfield_2=(-?\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException("Proper usage: <sound field_1=# field_2=# /> where # are both integers. Valid example: <sound field_1=5 field_2=4 />");
+                throw new ArgumentException($"Proper usage: <{Tag} field_1=# field_2=# /> where # are both integers. Valid example: <{Tag} field_1=5 field_2=4 />");
             }
             int temp = int.Parse(m.Groups[1].ToString());
             if (temp is < 0 or > 255)
             {
-                throw new ArgumentException($"Sound field_1 is invalid. Must be a number between 0 and 255, was: {temp}");
+                throw new ArgumentException($"{Tag} field_1 is invalid. Must be a number between 0 and 255, was: {temp}");
             }
             _field1 = (byte)temp;
             temp = int.Parse(m.Groups[2].ToString());
             if (temp is < 0 or > 255)
             {
-                throw new ArgumentException($"Sound field_2 is invalid. Must be a number between 0 and 255, was: {temp}");
+                throw new ArgumentException($"{Tag} field_2 is invalid. Must be a number between 0 and 255, was: {temp}");
             }
             _field2 = (byte)temp;
         }
@@ -48,7 +49,7 @@ namespace MsbtLib.Controls.Three
         }
         public override string ToControlString()
         {
-            return $"<sound field_1={_field1} field_2={_field2} />";
+            return $"<{Tag} field_1={_field1} field_2={_field2} />";
         }
     }
 }

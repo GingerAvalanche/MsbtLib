@@ -5,6 +5,7 @@ namespace MsbtLib.Controls.App
 {
     internal class Variable : Control
     {
+        public const string Tag = nameof(Variable);
         private readonly ushort _varType;
         private readonly ushort _paramSize;
         private readonly ushort _nameSize;
@@ -30,10 +31,10 @@ namespace MsbtLib.Controls.App
         }
         public Variable(string str)
         {
-            Match m = new Regex(@"<variable\stype=\w+(?:\((-?\d+)\))?\sname='((?:\w|\d)*)'\s/>").Match(str);
+            Match m = new Regex($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname='((?:\w|\d)*)'\s/>").Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException("Proper usage: <variable type=X(#) name='?' /> where X is a type name, # is a number, and ? is a string of letters/numbers only, and may be empty. Valid example: <variable type=Int(18) name=GiveItemNumber />");
+                throw new ArgumentException($"Proper usage: <{Tag} type=X(#) name='?' /> where X is a type name, # is a number, and ? is a string of letters/numbers only, and may be empty. Valid example: <{Tag} type=Int(18) name=GiveItemNumber />");
             }
             _varType = ushort.Parse(m.Groups[1].ToString());
             _name = m.Groups[2].Value;
@@ -54,7 +55,7 @@ namespace MsbtLib.Controls.App
         public override string ToControlString()
         {
             VariableType type = _varType < ControlHelpers.VariableTypes.Length ? ControlHelpers.VariableTypes[_varType] : VariableType.Unknown;
-            return $"<variable type={type}({_varType}) name='{_name}' />";
+            return $"<{Tag} type={type}({_varType}) name='{_name}' />";
         }
     }
 }

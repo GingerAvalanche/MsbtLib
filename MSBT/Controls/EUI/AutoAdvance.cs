@@ -4,6 +4,7 @@ namespace MsbtLib.Controls.EUI
 {
     internal class AutoAdvance : Control
     {
+        public const string Tag = nameof(AutoAdvance);
         public const ushort TagType = 0x0003;
         private const ushort ParamSize = 4;
         private readonly uint _frames;
@@ -14,11 +15,11 @@ namespace MsbtLib.Controls.EUI
         }
         public AutoAdvance(string str)
         {
-            Regex pattern = new(@"<auto_advance=(\d+)\s/>");
+            Regex pattern = new($@"<{Tag}=(\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success || uint.Parse(m.Groups[1].ToString()) > 65535)
             {
-                throw new Exception("Proper usage: <auto_advance=# /> where # is a number of frames between 0 and 65535. Valid examples: <auto_advance=30 /> or <auto_advance=60 />");
+                throw new Exception($"Proper usage: <{Tag}=# /> where # is a number of frames between 0 and 65535. Valid examples: <{Tag}=30 /> or <{Tag}=60 />");
             }
             _frames = uint.Parse(m.Groups[1].ToString());
         }
@@ -34,7 +35,7 @@ namespace MsbtLib.Controls.EUI
         }
         public override string ToControlString()
         {
-            return $"<auto_advance={_frames} />";
+            return $"<{Tag}={_frames} />";
         }
     }
 }

@@ -5,6 +5,7 @@ namespace MsbtLib.Controls.Four;
 
 internal class FourZero : Control
 {
+    public const string Tag = nameof(FourZero);
     public const ushort TagType = 0x0000;
     private readonly ushort _paramSize;
     private readonly ushort _strSize;
@@ -30,11 +31,11 @@ internal class FourZero : Control
 
     public FourZero(string str)
     {
-        Regex pattern = new(@"<fourzero str=((?:\w|\d)+)\s/>");
+        Regex pattern = new($@"<{Tag} str='((?:\w|\d)+)'\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
-            throw new ArgumentException("Proper usage: <animation=? /> where ? is a string with no whitespace. Valid examples: <animation=Activate /> or <animation=CustomLaugh />");
+            throw new ArgumentException($"Proper usage: <{Tag} str='?' /> where ? is a string. Valid examples: <{Tag} str='Call' /> or <{Tag} str='' />");
         }
         _str = m.Groups[1].ToString();
         _strSize = (ushort)(_str.Length * 2);
@@ -55,6 +56,6 @@ internal class FourZero : Control
 
     public override string ToControlString()
     {
-        return $"<fourzero str={_str} />";
+        return $"<{Tag} str='{_str}' />";
     }
 }
