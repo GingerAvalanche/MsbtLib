@@ -37,11 +37,11 @@ internal class ChoiceThreeOnFlag : Control
         Match m = pattern.Match(str);
         if (!m.Success)
         {
-            throw new ArgumentException($@"Proper usage: <{Tag} type=?(#) name='?' 0=# 1=# 2=# cancel=# />
+            throw new ArgumentException($@"Proper usage: <{Tag} type=?(#) name0='?' resp0=# name1='?' resp1=# name2='?' resp2=# cancel=# />
                     where all # are 16-bit integers, ? are strings of the applicable purpose, and cancel is the
                     1-based index of the choice that ends the dialogue. Valid examples: 
-                    <{Tag} type=Bool(9) name='Npc_Zora032_Mifa' 0=34 1=33 2=7 default=0 cancel=3 /> or 
-                    <{Tag} type=None(-1) name='' 0=16 1=17 2=18 default=1 cancel=3 />");
+                    <{Tag} type=Bool(9) name0='Npc_Zora032_Mifa' resp0=34 name1='' resp1=33 name2='' resp2=7 default=0 cancel=3 /> or 
+                    <{Tag} type=None(-1) name0='' resp0=16 name1='' resp1=17 name2='' resp2=18 default=1 cancel=3 />");
         }
         _varType = (ushort)short.Parse(m.Groups[1].Value);
         _flag0 = m.Groups[2].Value;

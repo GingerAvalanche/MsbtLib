@@ -71,25 +71,42 @@ Console.WriteLine(texts["Armor_063_Head_Desc"].Value);
 ```
 
 Valid tags are:
-* animation - `<animation=[name] />`
-* auto advance - `<auto_advance=[num_frames] />`
-* one choice - `<choice1=[key] />`†
-* two choice - `<choice2 0=[key] 1=[key] cancel=[index] />`†
-* three choice - `<choice3 0=[key] 1=[key] 2=[key] cancel=[index] >`†
-* four choice - `<choice4 0=[key] 1=[key] 2=[key] 3=[key] cancel=[index] >`†
-* font - `<font=[face] />` - Only `Normal` and `Hylian`
-* icon - `<icon=[character] />` - Some characters require numbers, e.g. `A(10)`
-* pause for a number of frames - `<pauseframes=[num_frames] />`
-* pause for a duration - `<pauselength=[duration] />` - Only `Short`, `Long`, or `Longer`
-* set text color - `<color=[color]>` - Only `Red`, `LightGreen1`, `Blue`, `Grey`,
-    `LightGreen4`, `Orange`, or `LightGrey`
-* reset text color to default - `</color>`
-* sound - `<sound field_1=[uint8] field_2=[uint8] />`‡
-* another sound type - `<sound2=[uint8] />`‡
-* text size - `<textsize percent=[num] />` - Be sure to `<textsize percent=100 />` to reset
-* variable - `<variable kind=[uint16] name=[name] />`♠ - `name` must correspond to a variable
-    name in the executable
+* Ruby = `<Ruby 0=[uint16] 1=[uint16] 2=[uint16] />`*
+* Font - `<Font='[face]'>` - Only `Normal` and `Hylian`
+* Reset font - `</Font>` - Alternative to `<Font='Normal'>`
+* Font size - `<FontSize percent=[num] />` - Be sure to `<textsize percent=100 />` to reset
+* Set text color - `<Color=[color]>` - Only `Red`, `Green`, `Cyan`, `Grey`, `Azure`, `Orange`, or `Gold`
+* Reset text color to default - `</Color>`
+* Page break - `<br />` or `<br>` - breaks to a clean dialogue statement, like using \n multiple times
+* Pause for a number of frames - `<Delay=[num_frames] />`
+* Text speed - `<TextSpeed=[uint32] />`*
+* No scroll - `<NoScroll />`*
+* Auto advance - `<AutoAdvance=[num_frames] />`
+* Two choice - `<Choice2 0=[key] 1=[key] cancel=[index] />`†
+* Three choice - `<Choice3 0=[key] 1=[key] 2=[key] cancel=[index] />`†
+* Four choice - `<Choice4 0=[key] 1=[key] 2=[key] 3=[key] cancel=[index] />`†
+* Icon - `<Icon=[character] />` - Some characters require numbers, e.g. `A(10)`
+* Three choice on flag - `<Choice3OnFlag type=[type](#) name0='[name]' resp0=[key] name1='[name]' resp1=[key] name2='[name]' resp2=[key] default=[index] cancel=[index] />`
+* Five flags - Too long to put here, and not well understood. See an example in an existing file.
+* One choice - `<Choice1=[key] />`†
+* Variable - `<Variable kind=[uint16] name='[name]' />`♠ - `name` must correspond to a variable name in the game flags
+* Sound - `<Sound field_1=[uint8] field_2=[uint8] />`‡
+* FourZero - `<FourZero str='[name]' />`*
+* Another sound type - `<Sound2=[uint8] />`‡
+* Animation - `<Animation='[name]' />`
+* FourThree - `<FourThree />`*
+* Pause for a duration - `<PauseLength=[duration] />` - Only `Short`, `Long`, or `Longer`
+* Info - `<Info gender=[uint8] definite=[uint8] indefinite=[uint8] plural=[uint8] />` - These u8s correspond to GrammarArticle.msbt
+* Definite - `<Definite />` - Inserts a language-based definite article based on an Info
+* Indefinite - `<Indefinite />` - Inserts a language-based indefinite article based on an Info
+* Capitalize - `<Capitalize />` - Capitalizes the next letter, often used with Variable
+* Downcase - `<Downcase />` - Downcases the next letter, often used with Variable
+* Gender - `<Gender masc='[str]' femme='[str]' neut='[str]' />` - Direct strings to be used for each gender phrasing
+* Pluralize - `<Pluralize 0='[str]' 1='[str]' 2='[str]' />` - Direct strings to be used for one, multiple, or many, used with Variable
+* LongVowel - `<LongVowel 0='[str]' 1='[str]' />` - Used for Korean*
+* LongVowel2 - `<LongVowel2 0='[str]' 1='[str]' />` - Used for Korean*
 
+\* - These tags are not well understood at this time  
 † - These `key`s are keys for other localized strings. Normally those keys are read from 
 the same MSBT, but in the case of shops, they are read from the shop NPC's MSBT. The keys 
 are read as `%04d`-formatted strings, e.g. 4 is read as "0004". The `index`es are for which 

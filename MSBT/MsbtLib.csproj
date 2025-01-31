@@ -8,7 +8,7 @@
 
     <PackageId>MsbtLib</PackageId>
     <Title>MsbtLib</Title>
-    <Version>0.9.3</Version>
+    <Version>0.10.0</Version>
     <Authors>GingerAvalanche</Authors>
     <Description>Package for loading and editing MSBT files</Description>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -17,6 +17,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <AnalysisLevel>latest</AnalysisLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

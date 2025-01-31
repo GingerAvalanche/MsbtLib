@@ -19,11 +19,11 @@ internal class LongVowel2 : Control
 
     public LongVowel2(string str)
     {
-        Regex pattern = new($@"<{Tag}\syes='((?:\w|\d)*)'\sno='((?:\w|\d)*)'\s/>");
+        Regex pattern = new($@"<{Tag}\s0='((?:\w|\d)*)'\s1='((?:\w|\d)*)'\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
-            throw new ArgumentException("I'll write this when I figure out what the unknown param(s) is/are!");
+            throw new ArgumentException("<LongVowel2 0='[str]' 1='[str]' />");
         }
         _param0 = m.Groups[1].Value;
         _param1 = m.Groups[2].Value;
@@ -44,6 +44,6 @@ internal class LongVowel2 : Control
 
     public override string ToControlString()
     {
-        return $"<{Tag} yes='{_param0}' no='{_param1}' />";
+        return $"<{Tag} 0='{_param0}' 1='{_param1}' />";
     }
 }

@@ -27,11 +27,11 @@ namespace MsbtLib.Controls.SystemTags
             }
             else
             {
-                Regex pattern = new($@"<{Tag}=(\w+)>");
+                Regex pattern = new($@"<{Tag}='(\w+)'>");
                 Match m = pattern.Match(str);
                 if (!m.Success)
                 {
-                    throw new ArgumentException($"The only recognized font in BOTW is Hylian: <{Tag}=Hylian>. Or reset to normal font with </{Tag}>");
+                    throw new ArgumentException($"The only recognized font in BOTW is Hylian: <{Tag}='Hylian'>. Or reset to normal font with </{Tag}>");
                 }
                 _face = (FontKind)Enum.Parse(typeof(FontKind), m.Groups[1].ToString());
             }
@@ -52,7 +52,7 @@ namespace MsbtLib.Controls.SystemTags
             {
                 return $"</{Tag}>";
             }
-            return $"<{Tag}={_face}>";
+            return $"<{Tag}='{_face}'>";
         }
     }
 }

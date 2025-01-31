@@ -17,11 +17,11 @@ namespace MsbtLib.Controls.FourTags
         }
         public Animation(string str)
         {
-            Regex pattern = new($@"<{Tag}=((?:\w|\d)+)\s/>");
+            Regex pattern = new($@"<{Tag}='((?:\w|\d)+)'\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {
-                throw new ArgumentException($"Proper usage: <{Tag}=? /> where ? is a string with no whitespace. Valid examples: <{Tag}=Activate /> or <{Tag}=CustomLaugh />");
+                throw new ArgumentException($"Proper usage: <{Tag}='?' /> where ? is a string with no whitespace. Valid examples: <{Tag}='Activate' /> or <{Tag}='CustomLaugh' />");
             }
             _name = m.Groups[1].ToString();
             _paramSize = (ushort)(_name.Length * 2 + 2);
@@ -38,7 +38,7 @@ namespace MsbtLib.Controls.FourTags
         }
         public override string ToControlString()
         {
-            return $"<{Tag}={_name} />";
+            return $"<{Tag}='{_name}' />";
         }
     }
 }

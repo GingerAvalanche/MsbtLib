@@ -20,7 +20,7 @@ internal class TextSpeed : Control
         bool success = uint.TryParse(m.Groups[1].ToString(), out uint temp);
         if (!success || temp > 65535)
         {
-            throw new Exception($"Proper usage: <{Tag}=# /> where # is a number of frames between 0 and 65535. Valid examples: <{Tag}=30 /> or <{Tag}=60 />");
+            throw new Exception($"Proper usage: <{Tag}=# /> where # is a number of frames between 0 and 4294967295. Valid examples: <{Tag}=30 /> or <{Tag}=60 />");
         }
         _speed = temp;
     }

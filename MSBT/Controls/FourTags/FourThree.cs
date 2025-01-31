@@ -10,7 +10,14 @@ internal class FourThree : Control
     {
         if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("FourTag paramSize not 0");
     }
-    public FourThree(string str) { }
+
+    public FourThree(string str)
+    {
+        if (str != $"<{Tag} />" && str != $"<{Tag}>")
+        {
+            throw new ArgumentException("Invalid FourThree string");
+        }
+    }
 
     public override byte[] ToControlSequence(EndiannessConverter converter)
     {
