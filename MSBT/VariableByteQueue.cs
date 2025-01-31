@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MsbtLib;
@@ -42,7 +41,7 @@ public ref struct VariableByteQueue(ref ReadOnlySpan<byte> buffer, Endianness en
     {
         ushort length = DequeueU16();
         StringBuilder b = new();
-        for (int i = 0; i < length; ++i)
+        for (int i = 0; i < length / 2; ++i)
         {
             b.Append((char)DequeueU16());
         }

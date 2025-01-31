@@ -2,7 +2,7 @@ using MsbtLib.Controls.GrammarTags;
 
 namespace MsbtLib.Controls;
 
-internal class GrammarTag
+internal static class GrammarTag
 {
     public const ushort Group = 0x00C9;
     
@@ -12,16 +12,16 @@ internal class GrammarTag
         return type switch
         {
             Info.TagType => new Info(ref queue),
-            1 => throw new NotImplementedException("201-1"),
-            2 => throw new NotImplementedException("201-2"),
+            Definite.TagType => new Definite(ref queue),
+            Indefinite.TagType => new Indefinite(ref queue),
             Capitalize.TagType => new Capitalize(ref queue),
             Downcase.TagType => new Downcase(ref queue),
-            5 => throw new NotImplementedException("201-5"),
-            6 => throw new NotImplementedException("201-6"),
-            7 => throw new NotImplementedException("201-7"),
-            8 => throw new NotImplementedException("201-8"),
-            9 => throw new NotImplementedException("201-9"),
-            10 => throw new NotImplementedException("201-10"),
+            Gender.TagType => new Gender(ref queue),
+            Pluralize.TagType => new Pluralize(ref queue),
+            LongVowel.TagType => new LongVowel(ref queue),
+            LongVowel2.TagType => new LongVowel2(ref queue),
+            9 => throw new NotImplementedException($"201 {type} {string.Join(" ", queue.ToArray())}"),
+            10 => throw new NotImplementedException($"201 {type} {string.Join(" ", queue.ToArray())}"),
             _ => throw new NotImplementedException($"201 {type} {string.Join(" ", queue.ToArray())}"),
         };
     }

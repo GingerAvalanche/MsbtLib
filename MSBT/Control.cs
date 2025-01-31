@@ -70,6 +70,14 @@ namespace MsbtLib
                 FourThree.Tag => new FourThree(s),
                 PauseLength.Tag => new PauseLength(s),
                 Info.Tag => new Info(s),
+                Capitalize.Tag => new Capitalize(s),
+                Definite.Tag => new Definite(s),
+                Indefinite.Tag => new Indefinite(s),
+                Downcase.Tag => new Downcase(s),
+                Gender.Tag => new Gender(s),
+                Pluralize.Tag => new Pluralize(s),
+                LongVowel.Tag => new LongVowel(s),
+                LongVowel2.Tag => new LongVowel2(s),
                 RawControl.Tag => new RawControl(s),
                 _ => throw new ArgumentException($"Invalid control string: {s}")
             };

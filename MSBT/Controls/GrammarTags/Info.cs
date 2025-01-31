@@ -14,6 +14,7 @@ internal class Info : Control
 
     public Info(ref VariableByteQueue queue)
     {
+        if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("Info parameter size mismatch");
         _gender = queue.DequeueU8();
         _definite = queue.DequeueU8();
         _indefinite = queue.DequeueU8();
