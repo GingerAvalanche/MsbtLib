@@ -12,7 +12,8 @@ namespace MsbtLib.Controls.EuiTags
         {
             if (queue.DequeueU16() != ParamSize) throw new InvalidDataException("ChoiceOne parameter size mismatch");
             _choice = queue.DequeueU16();
-            if (queue.DequeueU16() != 0x01CD) throw new InvalidDataException("ChoiceOne ending short mismatch");
+            if (queue.DequeueU8() != 0x01) throw new InvalidDataException("ChoiceOne default choice impossible");
+            if (queue.DequeueU8() != 0xCD) throw new InvalidDataException("ChoiceOne ending byte not 0xCD");
         }
         public ChoiceOne(string str)
         {
