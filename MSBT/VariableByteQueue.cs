@@ -1,39 +1,51 @@
+using System.Buffers.Binary;
+using System.Runtime.CompilerServices;
+using System.Text;
+
 namespace MsbtLib;
 
-public class VariableByteQueue(List<byte> queue, Endianness endianness)
+public ref struct VariableByteQueue(ref ReadOnlySpan<byte> buffer, Endianness endianness)
 {
-    private readonly Queue<byte> _queue = new(queue);
-    public int Count => _queue.Count;
+    private int _index = 0;
+    private ReadOnlySpan<byte> _buffer = buffer;
+    public int Count => _buffer[_index..].Length;
     
-    public byte[] ToArray() => _queue.ToArray();
+    public byte[] ToArray() => _buffer[_index..].ToArray();
     
-    public byte DequeueU8() => _queue.Dequeue();
+    public byte DequeueU8() => _buffer[_index++];
     
     public ushort DequeueU16()
     {
-        byte one = _queue.Dequeue();
-        byte two = _queue.Dequeue();
-        byte[] bytes = endianness switch
+        ushort value = endianness switch
         {
-            Endianness.Big => [two, one],
-            Endianness.Little => [one, two],
+            Endianness.Big => BinaryPrimitives.ReadUInt16BigEndian(_buffer[_index..]),
+            Endianness.Little => BinaryPrimitives.ReadUInt16LittleEndian(_buffer[_index..]),
             _ => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
         };
-        return BitConverter.ToUInt16(bytes, 0);
+        _index += 2;
+        return value;
     }
     
     public uint DequeueU32()
     {
-        byte one = _queue.Dequeue();
-        byte two = _queue.Dequeue();
-        byte three = _queue.Dequeue();
-        byte four = _queue.Dequeue();
-        byte[] bytes = endianness switch
+        uint value = endianness switch
         {
-            Endianness.Big => [four, three, two, one],
-            Endianness.Little => [one, two, three, four],
+            Endianness.Big => BinaryPrimitives.ReadUInt32BigEndian(_buffer[_index..]),
+            Endianness.Little => BinaryPrimitives.ReadUInt32LittleEndian(_buffer[_index..]),
             _ => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
         };
-        return BitConverter.ToUInt32(bytes, 0);
+        _index += 4;
+        return value;
+    }
+
+    public (ushort, string) DequeueCString()
+    {
+        ushort length = DequeueU16();
+        StringBuilder b = new();
+        for (int i = 0; i < length; ++i)
+        {
+            b.Append((char)DequeueU16());
+        }
+        return (length, b.ToString());
     }
 }

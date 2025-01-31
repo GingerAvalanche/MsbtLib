@@ -30,6 +30,8 @@ namespace MsbtLib
                     return FourTag.GetTag(ref queue);
                 case FiveTag.Group:
                     return FiveTag.GetTag(ref queue);
+                case GrammarTag.Group:
+                    return GrammarTag.GetTag(ref queue);
             }
             return new RawControl(tagGroup, ref queue);
         }

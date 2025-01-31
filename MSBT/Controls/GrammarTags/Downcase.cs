@@ -1,17 +1,17 @@
-namespace MsbtLib.Controls.SystemTags;
+namespace MsbtLib.Controls.GrammarTags;
 
-internal class PageBreak : Control
+internal class Downcase : Control
 {
-    public const string Tag = "br";
+    public const string Tag = nameof(Downcase);
     public const ushort TagType = 0x0004;
 
-    public PageBreak(ref VariableByteQueue queue) { }
+    public Downcase(ref VariableByteQueue queue) { }
 
-    public PageBreak(string str)
+    public Downcase(string str)
     {
-        if (str != $"<{Tag} />" && str != $"<{Tag}>")
+        if (str != $"<{Tag}>" && str != $"<{Tag} />")
         {
-            throw new ArgumentException("Invalid PageBreak string");
+            throw new ArgumentException("Invalid Downcase string.");
         }
     }
 
@@ -19,10 +19,11 @@ internal class PageBreak : Control
     {
         byte[] bytes = new byte[6];
         bytes.Merge(converter.GetBytes(ControlTag), 0);
-        bytes.Merge(converter.GetBytes(SystemTag.Group), 2);
+        bytes.Merge(converter.GetBytes(GrammarTag.Group), 2);
         bytes.Merge(converter.GetBytes(TagType), 4);
         return bytes;
     }
+
     public override string ToControlString()
     {
         return $"<{Tag} />";

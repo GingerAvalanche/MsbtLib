@@ -67,10 +67,10 @@ namespace MsbtLib
             }
             return bytes;
         }
-        public static string RawToString(List<byte> input, UtfEncoding encoding, EndiannessConverter converter)
+        public static string RawToString(ReadOnlySpan<byte> input, UtfEncoding encoding, EndiannessConverter converter)
         {
             char control = '\u000E';
-            VariableByteQueue queue = new(input, converter.Endianness);
+            VariableByteQueue queue = new(ref input, converter.Endianness);
             StringBuilder str = new();
             while (queue.Count > 0)
             {

@@ -8,25 +8,13 @@ internal class FourZero : Control
     public const string Tag = nameof(FourZero);
     public const ushort TagType = 0x0000;
     private readonly ushort _paramSize;
-    private readonly ushort _strSize;
     private readonly string _str;
 
     public FourZero(ref VariableByteQueue queue)
     {
         _paramSize = queue.DequeueU16();
-        _strSize = queue.DequeueU16();
-        if (_paramSize == 0)
-        {
-            _str = "";
-            return;
-        }
-        if (_paramSize != _strSize + 2) throw new InvalidDataException("FourZero parameter size mismatch");
-        StringBuilder b = new();
-        for (int i = 0; i < _strSize / 2; i++)
-        {
-            b.Append(queue.DequeueU8());
-        }
-        _str = b.ToString();
+        (ushort strSize, _str) = queue.DequeueCString();
+        if (_paramSize != strSize + 2) throw new InvalidDataException("FourZero parameter size mismatch");
     }
 
     public FourZero(string str)
@@ -38,8 +26,7 @@ internal class FourZero : Control
             throw new ArgumentException($"Proper usage: <{Tag} str='?' /> where ? is a string. Valid examples: <{Tag} str='Call' /> or <{Tag} str='' />");
         }
         _str = m.Groups[1].ToString();
-        _strSize = (ushort)(_str.Length * 2);
-        _paramSize = (ushort)(_strSize + 2);
+        _paramSize = (ushort)(_str.Length * 2 + 2);
     }
 
     public override byte[] ToControlSequence(EndiannessConverter converter)
@@ -49,8 +36,7 @@ internal class FourZero : Control
         bytes.Merge(converter.GetBytes(FourTag.Group), 2);
         bytes.Merge(converter.GetBytes(TagType), 4);
         bytes.Merge(converter.GetBytes(_paramSize), 6);
-        bytes.Merge(converter.GetBytes(_strSize), 8);
-        bytes.Merge(Encoding.Unicode.GetBytes(_str), 10);
+        bytes.Merge(converter.GetCString(_str), 8);
         return bytes;
     }
 

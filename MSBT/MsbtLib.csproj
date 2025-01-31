@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/GingerAvalanche/MsbtLib</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <AnalysisLevel>latest</AnalysisLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

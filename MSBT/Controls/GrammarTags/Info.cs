@@ -36,7 +36,6 @@ internal class Info : Control
 
     public override byte[] ToControlSequence(EndiannessConverter converter)
     {
-        
         byte[] bytes = new byte[ParamSize + 8];
         bytes.Merge(converter.GetBytes(ControlTag), 0);
         bytes.Merge(converter.GetBytes(AppTag.Group), 2);

@@ -4,7 +4,7 @@ namespace MsbtLib.Controls;
 
 internal class GrammarTag
 {
-    public const ushort Group = 0x0201;
+    public const ushort Group = 0x00C9;
     
     public static Control GetTag(ref VariableByteQueue queue)
     {
@@ -14,8 +14,8 @@ internal class GrammarTag
             Info.TagType => new Info(ref queue),
             1 => throw new NotImplementedException("201-1"),
             2 => throw new NotImplementedException("201-2"),
-            3 => throw new NotImplementedException("201-3"),
-            4 => throw new NotImplementedException("201-4"),
+            Capitalize.TagType => new Capitalize(ref queue),
+            Downcase.TagType => new Downcase(ref queue),
             5 => throw new NotImplementedException("201-5"),
             6 => throw new NotImplementedException("201-6"),
             7 => throw new NotImplementedException("201-7"),

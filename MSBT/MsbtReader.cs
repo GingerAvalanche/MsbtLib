@@ -60,7 +60,7 @@ namespace MsbtLib
                 }
                 foreach (var i in Enumerable.Range(0, (int)stringCount)) {
                     uint strEnd = i == stringCount - 1u ? section.Size : offsets[i + 1];
-                    strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]).ToList(), Header.Encoding, Header.Converter));
+                    strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]), Header.Encoding, Header.Converter));
                 }
             }
             return new Atr1(Header, section, stringCount, unknown1, strings);
@@ -121,7 +121,7 @@ namespace MsbtLib
             }
             foreach (var i in Enumerable.Range(0, (int)stringCount)) {
                 uint strEnd = i == stringCount - 1 ? section.Size : offsets[i + 1];
-                strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]).ToList(), Header.Encoding, Header.Converter));
+                strings.Add(Util.RawToString(_reader.Read(strEnd - offsets[i]), Header.Encoding, Header.Converter));
             }
             return new Txt2(Header, section, strings);
         }
