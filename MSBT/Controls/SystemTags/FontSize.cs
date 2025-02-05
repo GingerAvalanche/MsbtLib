@@ -40,7 +40,7 @@ namespace MsbtLib.Controls.SystemTags
         }
         public override string ToControlString()
         {
-            return $"<textsize percent={_size} />";
+            return $"<{Tag} percent={_size} />";
         }
     }
 }
