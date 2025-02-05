@@ -33,7 +33,7 @@ internal class ChoiceThreeOnFlag : Control
     }
     public ChoiceThreeOnFlag(string str)
     {
-        Regex pattern = new($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname0='(\w*)'\sresp0=(\d+)\sname1='(\w*)'\sresp1=(\d+)\sname2='(\w*)'\sresp2=(\d+)\sdefault=(\d)\scancel=(\d)\s/>");
+        Regex pattern = new($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname0='((?:\w|\d)*)'\sresp0=(\d+)\sname1='((?:\w|\d)*)'\sresp1=(\d+)\sname2='((?:\w|\d)*)'\sresp2=(\d+)\sdefault=(\d)\scancel=(\d)\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
@@ -78,6 +78,6 @@ internal class ChoiceThreeOnFlag : Control
     public override string ToControlString()
     {
         VariableType type = _varType == 0xFFFF ? VariableType.None : _varType < ControlHelpers.VariableTypes.Length ? ControlHelpers.VariableTypes[_varType] : VariableType.Unknown;
-        return $"<{Tag} type={type}({(short)_varType}) name0={_flag0} resp0={_choice0} name1={_flag1} resp1={_choice1} name2={_flag2} resp2={_choice2} default={_defaultIndex} cancel={_cancelIndex} />";
+        return $"<{Tag} type={type}({(short)_varType}) name0='{_flag0}' resp0={_choice0} name1='{_flag1}' resp1={_choice1} name2='{_flag2}' resp2={_choice2} default={_defaultIndex} cancel={_cancelIndex} />";
     }
 }
