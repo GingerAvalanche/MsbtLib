@@ -89,7 +89,7 @@ namespace MsbtLib.Controls.EuiTags
         }
         public Icon(string str)
         {
-            Regex pattern = new($@"<{Tag}=(\w+)(?:\((-?\d+)\))?\s/>");
+            Regex pattern = new($@"<{Tag}=(\w+)(?:\((\d+)\))?\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {

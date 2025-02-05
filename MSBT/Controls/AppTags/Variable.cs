@@ -24,7 +24,7 @@ namespace MsbtLib.Controls.AppTags
         }
         public Variable(string str)
         {
-            Match m = new Regex($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname='((?:\w|\d)*)'\s/>").Match(str);
+            Match m = new Regex($@"<{Tag}\stype=\w+(?:\((\d+)\))?\sname='((?:\w|\d)*)'\s/>").Match(str);
             if (!m.Success)
             {
                 throw new ArgumentException($"Proper usage: <{Tag} type=X(#) name='?' /> where X is a type name, # is a number, and ? is a string of letters/numbers only, and may be empty. Valid example: <{Tag} type=Int(18) name=GiveItemNumber />");

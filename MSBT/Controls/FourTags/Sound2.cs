@@ -16,7 +16,7 @@ namespace MsbtLib.Controls.FourTags
         }
         public Sound2(string str)
         {
-            Regex pattern = new($@"<{Tag}=(-?\d+)\s/>");
+            Regex pattern = new($@"<{Tag}=(\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {

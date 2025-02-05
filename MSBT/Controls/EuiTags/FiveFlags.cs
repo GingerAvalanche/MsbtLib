@@ -53,7 +53,7 @@ internal class FiveFlags : Control
 
     public FiveFlags(string str)
     {
-        Regex pattern = new($@"<{Tag}\sidx0=(\d)\sname0='(\w*)'\sval0=(-?\d+)\sidx1=(\d)\sname1='(\w*)'\sval1=(-?\d)\sidx2=(\d)\sname2='(\w*)'\sval2=(-?\d)\sidx3=(\d)\sname3='(\w*)'\sval3=(-?\d)\sidx4=(\d)\sname4='(\w*)'\sval4={{}}\sunk='(.*)'\s/>");
+        Regex pattern = new($@"<{Tag}\sidx0=(\d+)\sname0='((?:\w|\d)*)'\sval0=(-?\d+)\sidx1=(\d+)\sname1='((?:\w|\d)*)'\sval1=(-?\d+)\sidx2=(\d+)\sname2='((?:\w|\d)*)'\sval2=(-?\d+)\sidx3=(\d+)\sname3='((?:\w|\d)*)'\sval3=(-?\d+)\sidx4=(\d+)\sname4='((?:\w|\d)*)'\sval4=(-?\d+)\sunk='(.*)'\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
@@ -62,23 +62,23 @@ internal class FiveFlags : Control
         _flagIdx0 = ushort.Parse(m.Groups[1].Value);
         _flag0 = m.Groups[2].Value;
         ushort size0 = (ushort)(_flag0.Length * 2);
-        _flagVal0 = ushort.Parse(m.Groups[3].Value);
+        _flagVal0 = (ushort)short.Parse(m.Groups[3].Value);
         _flagIdx1 = ushort.Parse(m.Groups[4].Value);
         _flag1 = m.Groups[5].Value;
         ushort size1 = (ushort)(_flag1.Length * 2);
-        _flagVal1 = ushort.Parse(m.Groups[6].Value);
+        _flagVal1 = (ushort)short.Parse(m.Groups[6].Value);
         _flagIdx2 = ushort.Parse(m.Groups[7].Value);
         _flag2 = m.Groups[8].Value;
         ushort size2 = (ushort)(_flag2.Length * 2);
-        _flagVal2 = ushort.Parse(m.Groups[9].Value);
+        _flagVal2 = (ushort)short.Parse(m.Groups[9].Value);
         _flagIdx3 = ushort.Parse(m.Groups[10].Value);
         _flag3 = m.Groups[11].Value;
         ushort size3 = (ushort)(_flag3.Length * 2);
-        _flagVal3 = ushort.Parse(m.Groups[12].Value);
+        _flagVal3 = (ushort)short.Parse(m.Groups[12].Value);
         _flagIdx4 = ushort.Parse(m.Groups[13].Value);
         _flag4 = m.Groups[14].Value;
         ushort size4 = (ushort)(_flag4.Length * 2);
-        _flagVal4 = ushort.Parse(m.Groups[15].Value);
+        _flagVal4 = (ushort)short.Parse(m.Groups[15].Value);
         _unk = m.Groups[16].Value.Split(' ').Select(byte.Parse).ToArray();
         _paramSize = (ushort)(_unk.Length + size0 + size1 + size2 + size3 + size4 + 30);
     }
@@ -111,6 +111,8 @@ internal class FiveFlags : Control
 
     public override string ToControlString()
     {
-        return $"<{Tag} idx0={_flagIdx0} name0={_flag0} val0={(short)_flagVal0} idx1={_flagIdx1} name1={_flag1} val1={(short)_flagVal1} idx2={_flagIdx2} name2={_flag2} val2={(short)_flagVal2} idx3={_flagIdx3} name3={_flag3} val3={(short)_flagVal3} idx4={_flagIdx4} name4={_flag4} val4={(short)_flagVal4} unk='{string.Join(' ', _unk)}' />";
+        var ret = $"<{Tag} idx0={_flagIdx0} name0='{_flag0}' val0={(short)_flagVal0} idx1={_flagIdx1} name1='{_flag1}' val1={(short)_flagVal1} idx2={_flagIdx2} name2='{_flag2}' val2={(short)_flagVal2} idx3={_flagIdx3} name3='{_flag3}' val3={(short)_flagVal3} idx4={_flagIdx4} name4='{_flag4}' val4={(short)_flagVal4} unk='{string.Join(' ', _unk)}' />";
+        System.Diagnostics.Debug.WriteLine(ret);
+        return ret;
     }
 }

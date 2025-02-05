@@ -15,7 +15,7 @@ namespace MsbtLib.Controls.SystemTags
         }
         public FontSize(string str)
         {
-            Regex pattern = new($@"<{Tag}\spercent=(-?\d+)\s/>");
+            Regex pattern = new($@"<{Tag}\spercent=(\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {

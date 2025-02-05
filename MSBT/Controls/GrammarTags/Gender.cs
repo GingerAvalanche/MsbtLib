@@ -25,7 +25,7 @@ internal class Gender : Control
         Match m = pattern.Match(str);
         if (!m.Success)
         {
-            throw new ArgumentException($"<{Tag} masc=[str] femme=[str] neut=[str] />");
+            throw new ArgumentException($"<{Tag} masc='[str]' femme='[str]' neut='[str]' />");
         }
         _masc = m.Groups[1].Value;
         _femme = m.Groups[2].Value;

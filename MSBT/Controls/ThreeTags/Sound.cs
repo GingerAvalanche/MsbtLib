@@ -17,7 +17,7 @@ namespace MsbtLib.Controls.ThreeTags
         }
         public Sound(string str)
         {
-            Regex pattern = new(@$"<{Tag}\sfield_1=(-?\d+)\sfield_2=(-?\d+)\s/>");
+            Regex pattern = new(@$"<{Tag}\sfield_1=(\d+)\sfield_2=(\d+)\s/>");
             Match m = pattern.Match(str);
             if (!m.Success)
             {

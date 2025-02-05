@@ -32,7 +32,7 @@ namespace MsbtLib.Controls.SystemTags
             }
             else
             {
-                Match m = new Regex($@"<{Tag}=(.+)>").Match(str);
+                Match m = new Regex($@"<{Tag}=(\w+)>").Match(str);
                 if (!m.Success)
                 {
                     throw new Exception($"Proper usage: <{Tag}=?> where ? is one of: Red, Green, Cyan, Grey, Azure, Orange, Gold.");

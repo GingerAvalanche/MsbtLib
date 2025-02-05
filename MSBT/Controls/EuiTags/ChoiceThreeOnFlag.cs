@@ -33,7 +33,7 @@ internal class ChoiceThreeOnFlag : Control
     }
     public ChoiceThreeOnFlag(string str)
     {
-        Regex pattern = new($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname0='((?:\w|\d)*)'\sresp0=(\d+)\sname1='((?:\w|\d)*)'\sresp1=(\d+)\sname2='((?:\w|\d)*)'\sresp2=(\d+)\sdefault=(\d)\scancel=(\d)\s/>");
+        Regex pattern = new($@"<{Tag}\stype=\w+(?:\((-?\d+)\))?\sname0='((?:\w|\d)*)'\sresp0=(\d+)\sname1='((?:\w|\d)*)'\sresp1=(\d+)\sname2='((?:\w|\d)*)'\sresp2=(\d+)\sdefault=(\d+)\scancel=(\d+)\s/>");
         Match m = pattern.Match(str);
         if (!m.Success)
         {
